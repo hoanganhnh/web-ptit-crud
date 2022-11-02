@@ -82,15 +82,20 @@ function Item() {
         data
       );
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         setOpen(true);
+        navigate("/");
       }
     } catch (error) {
       console.log(error);
+      setOpen(false);
+      setErrorSave(true);
     }
   };
 
   const updateItem = async (data: any) => {
+    console.log("update");
+
     try {
       const response = await axios.patch(
         `http://localhost:5000/api/employees/${idItem}`,
@@ -102,6 +107,8 @@ function Item() {
       }
     } catch (error) {
       console.log(error);
+      setUpdate(false);
+      setErrorSave(true);
     }
   };
 
@@ -130,9 +137,7 @@ function Item() {
         return;
       }
 
-      setOpen(true);
       addNewItem(state);
-      navigate("/");
     } else {
       if (!state.name) {
         setErrors((preState) => ({ ...preState, name: "Name is require" }));
@@ -154,7 +159,6 @@ function Item() {
         }));
         return;
       }
-      console.log("update");
       // @ts-ignore
       if (state?.id) {
         // @ts-ignore
@@ -172,6 +176,7 @@ function Item() {
       return;
     }
     setOpen(false);
+    setErrorSave(false);
   };
 
   return (
@@ -249,7 +254,7 @@ function Item() {
           severity="error"
           sx={{ width: "100%" }}
         >
-          Save error
+          Save error, Name is existed !
         </Alert>
       </Snackbar>
       <Snackbar open={update} autoHideDuration={200} onClose={handleClose}>

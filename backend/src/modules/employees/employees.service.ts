@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -14,6 +14,10 @@ export class EmployeesService {
   ) {}
 
   async create(createEmployeeDto: CreateEmployeeDto) {
+    const employee = await this.findByName(createEmployeeDto.name);
+    if (employee) {
+      throw new BadRequestException('Item is exited !');
+    }
     return await this.employeeRepository.save(createEmployeeDto);
   }
 
@@ -36,5 +40,10 @@ export class EmployeesService {
   async remove(id: number) {
     const employee = await this.findOneById(id);
     return await this.employeeRepository.remove(employee);
+  }
+
+  async findByName(name: string) {
+    const employee = await this.employeeRepository.findOne({ where: { name } });
+    return employee;
   }
 }
