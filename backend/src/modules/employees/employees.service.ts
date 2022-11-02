@@ -16,7 +16,7 @@ export class EmployeesService {
   async create(createEmployeeDto: CreateEmployeeDto) {
     const employee = await this.findByName(createEmployeeDto.name);
     if (employee) {
-      throw new BadRequestException('Item is exited !');
+      throw new BadRequestException('Name is exited !');
     }
     return await this.employeeRepository.save(createEmployeeDto);
   }

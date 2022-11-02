@@ -1,4 +1,3 @@
-import { Type } from 'class-transformer';
 import { IsInt, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateEmployeeDto {
@@ -6,15 +5,15 @@ export class CreateEmployeeDto {
   @IsNotEmpty()
   name: string;
 
-  @Type(() => Date)
-  @IsNotEmpty()
-  dob: string;
-
   @IsString()
   @IsNotEmpty()
-  department: string;
+  species: string;
 
   @IsInt()
   @IsNotEmpty()
-  vaccinated: number;
+  age: number;
+
+  @IsInt()
+  @IsNotEmpty()
+  neutered: number;
 }

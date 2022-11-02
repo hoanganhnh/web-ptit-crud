@@ -19,38 +19,23 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-function convertDate(timestamp: string) {
-  const dateNow = new Date(timestamp);
-  const year = dateNow.getFullYear();
-  const monthWithOffset = dateNow.getUTCMonth() + 1;
-  const month =
-    monthWithOffset.toString().length < 2
-      ? `0${monthWithOffset}`
-      : monthWithOffset;
-  const date =
-    dateNow.getUTCDate().toString().length < 2
-      ? `0${dateNow.getUTCDate()}`
-      : dateNow.getUTCDate();
-
-  const materialDateInput = `${year}-${month}-${date}`;
-  return materialDateInput;
-}
-
 function Item() {
   const [open, setOpen] = React.useState(false);
   const [errorSave, setErrorSave] = React.useState(false);
   const [update, setUpdate] = React.useState(false);
 
+  const [errorName, setErrorName] = React.useState("");
+
   const [state, setState] = React.useState({
     name: "",
-    department: "",
-    vaccinated: 0,
-    dob: "",
+    species: "",
+    age: 0,
+    neutered: 0,
   });
   const [errors, setErrors] = React.useState({
     name: "",
-    department: "",
-    dob: "",
+    species: "",
+    age: "",
   });
   const { idItem } = useParams();
 
@@ -86,8 +71,10 @@ function Item() {
         setOpen(true);
         navigate("/");
       }
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      console.log(error.response.data.message);
+
+      setErrorName(error.response.data.message);
       setOpen(false);
       setErrorSave(true);
     }
@@ -121,18 +108,20 @@ function Item() {
         return;
       }
 
-      if (!state.department) {
+      if (!state.species) {
         setErrors((preState) => ({
           ...preState,
-          department: "department is require",
+          species: "species is require",
         }));
         return;
       }
 
-      if (!state.dob) {
+      if (+state.age === 0) {
+        console.log("addd");
+
         setErrors((preState) => ({
           ...preState,
-          dob: "dob is require",
+          age: "age is require != 0",
         }));
         return;
       }
@@ -144,21 +133,22 @@ function Item() {
         return;
       }
 
-      if (!state.department) {
+      if (!state.species) {
         setErrors((preState) => ({
           ...preState,
-          department: "department is require",
+          species: "species is require",
         }));
         return;
       }
 
-      if (!state.dob) {
+      if (!state.age) {
         setErrors((preState) => ({
           ...preState,
-          dob: "dob is require",
+          age: "age is require != 0",
         }));
         return;
       }
+
       // @ts-ignore
       if (state?.id) {
         // @ts-ignore
@@ -182,7 +172,7 @@ function Item() {
   return (
     <Box>
       <FormGroup>
-        <InputLabel htmlFor="name">Name</InputLabel>
+        <InputLabel htmlFor="name">name</InputLabel>
         <TextField
           id="name"
           aria-describedby="my-helper-text"
@@ -191,49 +181,50 @@ function Item() {
           required
           value={state.name}
           placeholder="Name"
-          helperText={errors.name}
-          error={errors.name ? true : false}
+          helperText={errors.name || errorName}
+          error={errors.name || errorName ? true : false}
           onChange={handleChangeState}
         />
-        <InputLabel htmlFor="department">Department</InputLabel>
+        <InputLabel htmlFor="species">species</InputLabel>
         <TextField
-          id="department"
+          id="species"
           aria-describedby="my-helper-text"
-          name="department"
+          name="species"
           color="primary"
           required
-          value={state.department}
-          placeholder="department"
-          helperText={errors.department}
-          error={errors.department ? true : false}
+          value={state.species}
+          placeholder="species"
+          helperText={errors.species}
+          error={errors.species ? true : false}
           onChange={handleChangeState}
         />
-        <InputLabel htmlFor="vaccinated">Vaccinated</InputLabel>
+        <InputLabel htmlFor="age">age</InputLabel>
         <TextField
-          id="vaccinated"
+          id="age"
           aria-describedby="my-helper-text"
-          name="vaccinated"
+          name="age"
           color="primary"
           required
           type="number"
-          value={state.vaccinated}
+          value={state.age}
+          helperText={errors.age}
+          error={errors.age ? true : false}
           placeholder="vaccinated"
           onChange={handleChangeState}
         />
-        <InputLabel htmlFor="dob">DOB</InputLabel>
+        <InputLabel htmlFor="neutered">neutered</InputLabel>
         <TextField
-          id="dob"
+          id="neutered"
           aria-describedby="my-helper-text"
-          name="dob"
+          name="neutered"
           color="primary"
           required
-          type="date"
-          value={idItem ? convertDate(state?.dob) : state?.dob}
-          placeholder="dob"
-          helperText={errors.dob}
-          error={errors.dob ? true : false}
+          type="number"
+          value={state.neutered}
+          placeholder="vaccinated"
           onChange={handleChangeState}
         />
+
         <Button
           variant="outlined"
           type="submit"
@@ -266,6 +257,9 @@ function Item() {
           This is a Update successfull
         </Alert>
       </Snackbar>
+      <Button onClick={() => navigate("/")} sx={{ marginTop: "200px" }}>
+        👉 Back to home
+      </Button>
     </Box>
   );
 }

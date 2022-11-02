@@ -8,12 +8,12 @@ export class Employee {
   @Column()
   name: string;
 
-  @Column({ name: 'dob', type: 'timestamp' })
-  dob: Date;
-
   @Column()
-  department: string;
+  species: string;
 
   @Column({ type: 'int' })
-  vaccinated: number;
+  age: number;
+
+  @Column({ type: 'int' })
+  neutered: number;
 }

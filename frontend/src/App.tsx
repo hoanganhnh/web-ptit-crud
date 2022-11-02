@@ -24,9 +24,9 @@ import "./styles/App.css";
 type Employee = {
   id: number;
   name: string;
-  dob: string;
-  department: string;
-  vaccinated: number;
+  species: string;
+  age: number;
+  neutered: number;
 };
 
 function App() {
@@ -78,16 +78,16 @@ function App() {
         sx={{ marginBottom: "40px" }}
         onClick={addNew}
       >
-        New Item
+        New Pet
       </Button>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 1200 }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell align="center">DOB</TableCell>
-              <TableCell align="right">Department</TableCell>
-              <TableCell align="right">Vaccinated</TableCell>
+              <TableCell>name</TableCell>
+              <TableCell align="center">species</TableCell>
+              <TableCell align="right">age</TableCell>
+              <TableCell align="right">neutered</TableCell>
               <TableCell align="center">Action</TableCell>
             </TableRow>
           </TableHead>
@@ -100,13 +100,11 @@ function App() {
                 <TableCell component="th" scope="row">
                   {row.name}
                 </TableCell>
-                <TableCell align="center">
-                  {new Date(row.dob).toLocaleDateString()}
-                </TableCell>
-                <TableCell align="right">{row.department}</TableCell>
+                <TableCell align="center">{row.species}</TableCell>
+                <TableCell align="right">{row.age}</TableCell>
                 <TableCell align="right">
                   <Checkbox
-                    checked={row.vaccinated > 0 ? true : false}
+                    checked={row.neutered > 0 ? true : false}
                     size="small"
                     disabled
                   />
@@ -135,11 +133,11 @@ function App() {
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {"Do you want delete item?"}
+          {"Do you want delete item? ❌"}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Delete One Item
+            Delete One Item ⭕️ 😬
           </DialogContentText>
         </DialogContent>
         <DialogActions>
