@@ -48,11 +48,11 @@ function App() {
   };
 
   const addNew = () => {
-    navigate("/handle");
+    navigate("/action");
   };
 
   const editItem = (id: number) => {
-    navigate(`/handle/${id}`);
+    navigate(`/action/${id}`);
   };
 
   const handleDeleteItem = async () => {
@@ -88,7 +88,7 @@ function App() {
               <TableCell align="center">DOB</TableCell>
               <TableCell align="right">Department</TableCell>
               <TableCell align="right">Vaccinated</TableCell>
-              <TableCell align="right">Action</TableCell>
+              <TableCell align="center">Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

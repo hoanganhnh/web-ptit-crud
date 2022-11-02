@@ -9,7 +9,7 @@ import {
   TextField,
 } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
@@ -18,6 +18,23 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 ) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
+
+function convertDate(timestamp: string) {
+  const dateNow = new Date(timestamp);
+  const year = dateNow.getFullYear();
+  const monthWithOffset = dateNow.getUTCMonth() + 1;
+  const month =
+    monthWithOffset.toString().length < 2
+      ? `0${monthWithOffset}`
+      : monthWithOffset;
+  const date =
+    dateNow.getUTCDate().toString().length < 2
+      ? `0${dateNow.getUTCDate()}`
+      : dateNow.getUTCDate();
+
+  const materialDateInput = `${year}-${month}-${date}`;
+  return materialDateInput;
+}
 
 function Item() {
   const [open, setOpen] = React.useState(false);
@@ -36,6 +53,8 @@ function Item() {
     dob: "",
   });
   const { idItem } = useParams();
+
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     if (idItem) {
@@ -113,7 +132,28 @@ function Item() {
 
       setOpen(true);
       addNewItem(state);
+      navigate("/");
     } else {
+      if (!state.name) {
+        setErrors((preState) => ({ ...preState, name: "Name is require" }));
+        return;
+      }
+
+      if (!state.department) {
+        setErrors((preState) => ({
+          ...preState,
+          department: "department is require",
+        }));
+        return;
+      }
+
+      if (!state.dob) {
+        setErrors((preState) => ({
+          ...preState,
+          dob: "dob is require",
+        }));
+        return;
+      }
       console.log("update");
       // @ts-ignore
       if (state?.id) {
@@ -131,10 +171,8 @@ function Item() {
     if (reason === "clickaway") {
       return;
     }
-
     setOpen(false);
   };
-  console.log(state);
 
   return (
     <Box>
@@ -184,10 +222,8 @@ function Item() {
           name="dob"
           color="primary"
           required
-          type="text"
-          value={
-            idItem ? new Date(state?.dob).toLocaleDateString() : state?.dob
-          }
+          type="date"
+          value={idItem ? convertDate(state?.dob) : state?.dob}
           placeholder="dob"
           helperText={errors.dob}
           error={errors.dob ? true : false}
@@ -216,7 +252,7 @@ function Item() {
           Save error
         </Alert>
       </Snackbar>
-      <Snackbar open={update} autoHideDuration={2000} onClose={handleClose}>
+      <Snackbar open={update} autoHideDuration={200} onClose={handleClose}>
         <Alert
           onClose={() => setUpdate(false)}
           severity="success"

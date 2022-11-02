@@ -11,7 +11,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />} />
-        <Route path="/handle">
+        <Route path="/action">
           <Route index element={<Item />} />
           <Route path=":idItem" element={<Item />} />
         </Route>
