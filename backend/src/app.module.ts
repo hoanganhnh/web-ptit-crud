@@ -3,7 +3,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { BooksModule } from './modules/books/books.module';
-import { EmployeesModule } from './modules/employees/employees.module';
 
 @Module({
   imports: [
@@ -28,7 +27,6 @@ import { EmployeesModule } from './modules/employees/employees.module';
         };
       },
     }),
-    EmployeesModule,
   ],
   controllers: [],
   providers: [],

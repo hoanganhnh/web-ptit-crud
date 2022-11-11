@@ -10,7 +10,8 @@ import {
 } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
+
+import axiosClient from "../services/axios-client";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
@@ -48,7 +49,7 @@ function Item() {
   }, [idItem]);
 
   const getItemById = async (id: number) => {
-    const res = await axios.get(`http://localhost:5000/api/employees/${id}`);
+    const res = await axiosClient.get(`books/${id}`);
     setState(res.data);
   };
 
@@ -62,10 +63,7 @@ function Item() {
 
   const addNewItem = async (data: any) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/employees",
-        data
-      );
+      const response = await axiosClient.post("books", data);
 
       if (response.status === 201) {
         setOpen(true);
@@ -84,10 +82,7 @@ function Item() {
     console.log("update");
 
     try {
-      const response = await axios.patch(
-        `http://localhost:5000/api/employees/${idItem}`,
-        data
-      );
+      const response = await axiosClient.patch(`books/${idItem}`, data);
 
       if (response.status === 200) {
         setUpdate(true);

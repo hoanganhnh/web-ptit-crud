@@ -17,27 +17,30 @@ import {
   Box,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+
+import axiosClient from "./services/axios-client";
 
 import "./styles/App.css";
 
-type Employee = {
+type BookType = {
   id: number;
-  name: string;
-  species: string;
-  age: number;
-  neutered: number;
+  title: string;
+  author: string;
+  description: string;
+  publicDate: string;
+  page: number;
+  category: string;
 };
 
 function App() {
   const navigate = useNavigate();
-  const [data, setData] = React.useState<Employee[]>([]);
+  const [data, setData] = React.useState<BookType[]>([]);
   const [open, setOpen] = React.useState(false);
   const [itemId, setItemId] = React.useState<number>(0);
 
   React.useEffect(() => {
     const getDatas = async () => {
-      const res = await axios.get("http://localhost:5000/api/employees");
+      const res = await axiosClient.get("books");
       setData(res.data);
     };
     getDatas();
@@ -57,7 +60,7 @@ function App() {
 
   const handleDeleteItem = async () => {
     setData((preData) => preData.filter((d) => d.id !== +itemId));
-    await axios.delete(`http://localhost:5000/api/employees/${itemId}`);
+    await axiosClient.delete(`books/${itemId}`);
   };
 
   const deleleItem = (id: number) => {
@@ -84,10 +87,11 @@ function App() {
         <Table sx={{ minWidth: 1200 }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell>name</TableCell>
-              <TableCell align="center">species</TableCell>
-              <TableCell align="right">age</TableCell>
-              <TableCell align="right">neutered</TableCell>
+              <TableCell align="center">title</TableCell>
+              <TableCell align="center">author</TableCell>
+              <TableCell align="center">public date</TableCell>
+              <TableCell align="center">page</TableCell>
+              <TableCell align="center">category</TableCell>
               <TableCell align="center">Action</TableCell>
             </TableRow>
           </TableHead>
@@ -97,18 +101,13 @@ function App() {
                 key={row.id}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
-                <TableCell component="th" scope="row">
-                  {row.name}
+                <TableCell align="center">{row.title}</TableCell>
+                <TableCell align="center">{row.author}</TableCell>
+                <TableCell align="center">
+                  {new Date(row.publicDate).toLocaleDateString()}
                 </TableCell>
-                <TableCell align="center">{row.species}</TableCell>
-                <TableCell align="right">{row.age}</TableCell>
-                <TableCell align="right">
-                  <Checkbox
-                    checked={row.neutered > 0 ? true : false}
-                    size="small"
-                    disabled
-                  />
-                </TableCell>
+                <TableCell align="center">{row.page}</TableCell>
+                <TableCell align="center">{row.category}</TableCell>
                 <TableCell align="center">
                   <Button
                     variant="contained"
