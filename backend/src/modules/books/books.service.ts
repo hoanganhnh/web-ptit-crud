@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { Book } from './entities/book.entity';
@@ -20,17 +21,17 @@ export class BooksService {
     return await this.bookRepository.find();
   }
 
-  async findOneById(id: string) {
+  async findOneById(id: number) {
     const book = await this.bookRepository.findOne({ where: { id } });
     return book;
   }
 
-  async update(id: string, updateBookDto: UpdateBookDto) {
+  async update(id: number, updateBookDto: UpdateBookDto) {
     const book = await this.bookRepository.preload({ id, ...updateBookDto });
     return await this.bookRepository.save(book);
   }
 
-  async remove(id: string) {
+  async remove(id: number) {
     return await this.bookRepository.delete(id);
   }
 }

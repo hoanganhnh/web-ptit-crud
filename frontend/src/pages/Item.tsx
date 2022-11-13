@@ -4,14 +4,25 @@ import {
   Box,
   Button,
   FormGroup,
+  Grid,
   InputLabel,
   Snackbar,
   TextField,
+  Typography,
 } from "@mui/material";
+import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import MuiAlert from "@mui/material/Alert";
 import { useNavigate, useParams } from "react-router-dom";
+import dayjs, { Dayjs } from "dayjs";
+import axios from "axios";
 
 import axiosClient from "../services/axios-client";
+import Book from "../types/type-book";
+import FileUpload, {
+  FileUploadProps,
+} from "../components/file-upload/FileUpload";
+import FileUploadv2 from "../components/file-upload-v2/FileUploadv2";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
@@ -25,19 +36,19 @@ function Item() {
   const [errorSave, setErrorSave] = React.useState(false);
   const [update, setUpdate] = React.useState(false);
 
-  const [errorName, setErrorName] = React.useState("");
+  const [imgUrl, setImgUrl] = React.useState<string>("");
 
-  const [state, setState] = React.useState({
-    name: "",
-    species: "",
-    age: 0,
-    neutered: 0,
+  const [state, setState] = React.useState<Book>({
+    title: "",
+    author: "",
+    description: "",
+    publicDate: "",
+    page: 0,
+    category: "",
   });
-  const [errors, setErrors] = React.useState({
-    name: "",
-    species: "",
-    age: "",
-  });
+
+  const [publicDate, setPublicDate] = React.useState<Dayjs | null>(null);
+
   const { idItem } = useParams();
 
   const navigate = useNavigate();
@@ -50,7 +61,9 @@ function Item() {
 
   const getItemById = async (id: number) => {
     const res = await axiosClient.get(`books/${id}`);
+    delete res.data.id;
     setState(res.data);
+    setPublicDate(res.data.publicDate);
   };
 
   const handleChangeState = (
@@ -58,7 +71,6 @@ function Item() {
   ) => {
     const { name, value } = e.target;
     setState({ ...state, [name]: value });
-    setErrors({ ...errors, [name]: "" });
   };
 
   const addNewItem = async (data: any) => {
@@ -70,86 +82,28 @@ function Item() {
         navigate("/");
       }
     } catch (error: any) {
-      console.log(error.response.data.message);
-
-      setErrorName(error.response.data.message);
       setOpen(false);
       setErrorSave(true);
     }
   };
 
-  const updateItem = async (data: any) => {
-    console.log("update");
-
+  const updateItem = async (data: Book) => {
     try {
-      const response = await axiosClient.patch(`books/${idItem}`, data);
+      const response = await axios.patch(
+        `http://localhost:5000/api/books/${idItem}`,
+        data
+      );
+
+      // const response = await axiosClient.patch(`books/${idItem}`, data);
 
       if (response.status === 200) {
+        console.log(response.data);
         setUpdate(true);
       }
     } catch (error) {
       console.log(error);
       setUpdate(false);
       setErrorSave(true);
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-
-    if (!idItem) {
-      if (!state.name) {
-        setErrors((preState) => ({ ...preState, name: "Name is require" }));
-        return;
-      }
-
-      if (!state.species) {
-        setErrors((preState) => ({
-          ...preState,
-          species: "species is require",
-        }));
-        return;
-      }
-
-      if (+state.age === 0) {
-        console.log("addd");
-
-        setErrors((preState) => ({
-          ...preState,
-          age: "age is require != 0",
-        }));
-        return;
-      }
-
-      addNewItem(state);
-    } else {
-      if (!state.name) {
-        setErrors((preState) => ({ ...preState, name: "Name is require" }));
-        return;
-      }
-
-      if (!state.species) {
-        setErrors((preState) => ({
-          ...preState,
-          species: "species is require",
-        }));
-        return;
-      }
-
-      if (!state.age) {
-        setErrors((preState) => ({
-          ...preState,
-          age: "age is require != 0",
-        }));
-        return;
-      }
-
-      // @ts-ignore
-      if (state?.id) {
-        // @ts-ignore
-        delete state.id;
-        updateItem(state);
-      }
     }
   };
 
@@ -164,97 +118,134 @@ function Item() {
     setErrorSave(false);
   };
 
+  const handleChangeDate = (newValue: Dayjs | null) => {
+    setPublicDate(newValue);
+    setState({ ...state, publicDate: dayjs(newValue).format() });
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!idItem) {
+      addNewItem(state);
+    } else {
+      updateItem(state);
+    }
+  };
+
   return (
     <Box>
-      <FormGroup>
-        <InputLabel htmlFor="name">name</InputLabel>
-        <TextField
-          id="name"
-          aria-describedby="my-helper-text"
-          name="name"
-          color="primary"
-          required
-          value={state.name}
-          placeholder="Name"
-          helperText={errors.name || errorName}
-          error={errors.name || errorName ? true : false}
-          onChange={handleChangeState}
-        />
-        <InputLabel htmlFor="species">species</InputLabel>
-        <TextField
-          id="species"
-          aria-describedby="my-helper-text"
-          name="species"
-          color="primary"
-          required
-          value={state.species}
-          placeholder="species"
-          helperText={errors.species}
-          error={errors.species ? true : false}
-          onChange={handleChangeState}
-        />
-        <InputLabel htmlFor="age">age</InputLabel>
-        <TextField
-          id="age"
-          aria-describedby="my-helper-text"
-          name="age"
-          color="primary"
-          required
-          type="number"
-          value={state.age}
-          helperText={errors.age}
-          error={errors.age ? true : false}
-          placeholder="vaccinated"
-          onChange={handleChangeState}
-        />
-        <InputLabel htmlFor="neutered">neutered</InputLabel>
-        <TextField
-          id="neutered"
-          aria-describedby="my-helper-text"
-          name="neutered"
-          color="primary"
-          required
-          type="number"
-          value={state.neutered}
-          placeholder="vaccinated"
-          onChange={handleChangeState}
-        />
+      <Grid container>
+        <Grid item xs={6} justifyContent="center">
+          <Typography
+            component="h1"
+            variant="h5"
+            marginBottom={2}
+            color="GrayText"
+          >
+            Book action
+          </Typography>
+          <Box component="form" onSubmit={handleSubmit}>
+            <InputLabel htmlFor="title">title</InputLabel>
+            <TextField
+              id="title"
+              name="title"
+              color="primary"
+              placeholder="title"
+              fullWidth
+              required
+              // error={!!errors.title}
+              // helperText={errors.title ? errors.title.message : ""}
+              value={state.title}
+              onChange={handleChangeState}
+            />
+            <InputLabel htmlFor="author">author</InputLabel>
+            <TextField
+              id="author"
+              aria-describedby="my-helper-text"
+              color="primary"
+              name="author"
+              required
+              fullWidth
+              placeholder="author"
+              // error={!!errors.author}
+              // helperText={errors.author ? errors.author.message : ""}
+              value={state.author}
+              onChange={handleChangeState}
+            />
+            <InputLabel htmlFor="description">description</InputLabel>
+            <TextField
+              id="description"
+              name="description"
+              aria-describedby="my-helper-text"
+              color="primary"
+              required
+              fullWidth
+              type="string"
+              placeholder="description"
+              // error={!!errors.description}
+              // helperText={errors.description ? errors.description.message : ""}
+              value={state.description}
+              onChange={handleChangeState}
+            />
+            <InputLabel htmlFor="publicDate">publicDate</InputLabel>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DesktopDatePicker
+                inputFormat="MM/DD/YYYY"
+                value={publicDate}
+                onChange={handleChangeDate}
+                onError={(a) => {
+                  console.log(a);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    name="publicDate"
+                    fullWidth
+                    required
+                    // error={!!errors.publicDate}
+                    // helperText={
+                    //   errors.publicDate ? errors.publicDate.message : ""
+                    // }
+                    onChange={handleChangeState}
+                  />
+                )}
+              />
+            </LocalizationProvider>
+            <InputLabel htmlFor="page">page</InputLabel>
+            <TextField
+              id="page"
+              name="page"
+              aria-describedby="my-helper-text"
+              color="primary"
+              required
+              fullWidth
+              type="number"
+              placeholder="page"
+              // error={!!errors.page}
+              // helperText={errors.page ? errors.page.message : ""}
 
-        <Button
-          variant="outlined"
-          type="submit"
-          onClick={handleSubmit}
-          sx={{ marginTop: "20px" }}
-        >
-          {idItem ? "Update" : "Save"}
-        </Button>
-      </FormGroup>
-      <Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
-        <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
-          This is a Add new Successfull
-        </Alert>
-      </Snackbar>
-      <Snackbar open={errorSave} autoHideDuration={2000} onClose={handleClose}>
-        <Alert
-          onClose={() => setErrorSave(false)}
-          severity="error"
-          sx={{ width: "100%" }}
-        >
-          Save error, Name is existed !
-        </Alert>
-      </Snackbar>
-      <Snackbar open={update} autoHideDuration={200} onClose={handleClose}>
-        <Alert
-          onClose={() => setUpdate(false)}
-          severity="success"
-          sx={{ width: "100%" }}
-        >
-          This is a Update successfull
-        </Alert>
-      </Snackbar>
-      <Button onClick={() => navigate("/")} sx={{ marginTop: "200px" }}>
-        👉 Back to home
-      </Button>
+              value={state.page}
+              onChange={handleChangeState}
+            />
+
+            <Button variant="outlined" type="submit" sx={{ marginTop: "24px" }}>
+              {idItem ? "Update" : "Save"}
+            </Button>
+          </Box>
+        </Grid>
+        <Grid item xs={6} justifyContent="center" paddingLeft={2}>
+          <Typography
+            component="h1"
+            variant="h5"
+            marginBottom={2}
+            color="GrayText"
+          >
+            Upload Image
+          </Typography>
+          <FileUploadv2 />
+        </Grid>
+      </Grid>
     </Box>
   );
 }

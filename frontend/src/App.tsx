@@ -8,7 +8,6 @@ import {
   TableCell,
   TableBody,
   Button,
-  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
@@ -19,22 +18,13 @@ import {
 import { useNavigate } from "react-router-dom";
 
 import axiosClient from "./services/axios-client";
+import Book from "./types/type-book";
 
 import "./styles/App.css";
 
-type BookType = {
-  id: number;
-  title: string;
-  author: string;
-  description: string;
-  publicDate: string;
-  page: number;
-  category: string;
-};
-
 function App() {
   const navigate = useNavigate();
-  const [data, setData] = React.useState<BookType[]>([]);
+  const [data, setData] = React.useState<(Book & { id: number })[]>([]);
   const [open, setOpen] = React.useState(false);
   const [itemId, setItemId] = React.useState<number>(0);
 
@@ -81,7 +71,7 @@ function App() {
         sx={{ marginBottom: "40px" }}
         onClick={addNew}
       >
-        New Pet
+        New Book
       </Button>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 1200 }} aria-label="simple table">
