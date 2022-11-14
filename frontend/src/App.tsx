@@ -14,8 +14,11 @@ import {
   DialogContentText,
   DialogTitle,
   Box,
+  AppBar,
+  Toolbar,
+  Typography,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import axiosClient from "./services/axios-client";
 import Book from "./types/type-book";
@@ -65,6 +68,23 @@ function App() {
 
   return (
     <Box className="App">
+      <Box sx={{ flexGrow: 1, marginBottom: 5 }}>
+        <AppBar position="static" color="inherit">
+          <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Typography variant="h6" component="div">
+              MVC Book Online
+            </Typography>
+            <Box component="div">
+              <Button color="primary">
+                <Link to="/signin">Sign In</Link>
+              </Button>
+              <Button color="primary">
+                <Link to="/signup">Sign Up</Link>
+              </Button>
+            </Box>
+          </Toolbar>
+        </AppBar>
+      </Box>
       <Button
         variant="contained"
         color="success"

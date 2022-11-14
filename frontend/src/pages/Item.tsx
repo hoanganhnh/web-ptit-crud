@@ -6,6 +6,9 @@ import {
   FormGroup,
   Grid,
   InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
   Snackbar,
   TextField,
   Typography,
@@ -47,6 +50,8 @@ function Item() {
     category: "",
   });
 
+  const [disabled, setDisabled] = React.useState<boolean>(true);
+
   const [publicDate, setPublicDate] = React.useState<Dayjs | null>(null);
 
   const { idItem } = useParams();
@@ -56,6 +61,8 @@ function Item() {
   React.useEffect(() => {
     if (idItem) {
       getItemById(+idItem);
+    } else {
+      setDisabled(false);
     }
   }, [idItem]);
 
@@ -75,13 +82,18 @@ function Item() {
 
   const addNewItem = async (data: any) => {
     try {
-      const response = await axiosClient.post("books", data);
+      const response = await axios.post(
+        `http://localhost:5000/api/books`,
+        data
+      );
 
       if (response.status === 201) {
         setOpen(true);
         navigate("/");
       }
     } catch (error: any) {
+      console.log(error);
+
       setOpen(false);
       setErrorSave(true);
     }
@@ -89,6 +101,7 @@ function Item() {
 
   const updateItem = async (data: Book) => {
     try {
+      // @TODO: update axios instance
       const response = await axios.patch(
         `http://localhost:5000/api/books/${idItem}`,
         data
@@ -97,7 +110,6 @@ function Item() {
       // const response = await axiosClient.patch(`books/${idItem}`, data);
 
       if (response.status === 200) {
-        console.log(response.data);
         setUpdate(true);
       }
     } catch (error) {
@@ -126,10 +138,25 @@ function Item() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (!disabled) {
+      return;
+    }
     if (!idItem) {
       addNewItem(state);
     } else {
       updateItem(state);
+    }
+  };
+
+  const handleChangeCategory = (event: SelectChangeEvent) => {
+    setState({ ...state, category: event.target.value });
+  };
+
+  const handleChangeAction = () => {
+    if (disabled) {
+      setDisabled(false);
+    } else {
+      setDisabled(true);
     }
   };
 
@@ -158,6 +185,7 @@ function Item() {
               // helperText={errors.title ? errors.title.message : ""}
               value={state.title}
               onChange={handleChangeState}
+              disabled={disabled}
             />
             <InputLabel htmlFor="author">author</InputLabel>
             <TextField
@@ -172,6 +200,7 @@ function Item() {
               // helperText={errors.author ? errors.author.message : ""}
               value={state.author}
               onChange={handleChangeState}
+              disabled={disabled}
             />
             <InputLabel htmlFor="description">description</InputLabel>
             <TextField
@@ -179,7 +208,6 @@ function Item() {
               name="description"
               aria-describedby="my-helper-text"
               color="primary"
-              required
               fullWidth
               type="string"
               placeholder="description"
@@ -187,6 +215,7 @@ function Item() {
               // helperText={errors.description ? errors.description.message : ""}
               value={state.description}
               onChange={handleChangeState}
+              disabled={disabled}
             />
             <InputLabel htmlFor="publicDate">publicDate</InputLabel>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -208,10 +237,24 @@ function Item() {
                     //   errors.publicDate ? errors.publicDate.message : ""
                     // }
                     onChange={handleChangeState}
+                    disabled={disabled}
                   />
                 )}
               />
             </LocalizationProvider>
+            <InputLabel id="category-id">category</InputLabel>
+            <Select
+              labelId="category-id"
+              id="demo-simple-select-autowidth"
+              value={state.category || "Coding"}
+              onChange={handleChangeCategory}
+              fullWidth
+              disabled={disabled}
+            >
+              <MenuItem value={"Coding"}>Coding</MenuItem>
+              <MenuItem value={"Hacking"}>Hacking</MenuItem>
+              <MenuItem value={"Debuger"}>Debuger</MenuItem>
+            </Select>
             <InputLabel htmlFor="page">page</InputLabel>
             <TextField
               id="page"
@@ -222,15 +265,22 @@ function Item() {
               fullWidth
               type="number"
               placeholder="page"
+              InputProps={{ inputProps: { min: 0 } }}
               // error={!!errors.page}
               // helperText={errors.page ? errors.page.message : ""}
 
               value={state.page}
               onChange={handleChangeState}
+              disabled={disabled}
             />
 
-            <Button variant="outlined" type="submit" sx={{ marginTop: "24px" }}>
-              {idItem ? "Update" : "Save"}
+            <Button
+              variant="outlined"
+              type="submit"
+              sx={{ marginTop: "24px" }}
+              onClick={handleChangeAction}
+            >
+              {idItem ? (disabled ? "Edit" : "Update") : "Add"}
             </Button>
           </Box>
         </Grid>
