@@ -22,6 +22,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import axiosClient from "./services/axios-client";
 import Book from "./types/type-book";
+import { getLocalStorage, removeLocalStorage } from "./utils/local-storage";
 
 import "./styles/App.css";
 
@@ -31,12 +32,21 @@ function App() {
   const [open, setOpen] = React.useState(false);
   const [itemId, setItemId] = React.useState<number>(0);
 
+  const [user, setUser] = React.useState({});
+
   React.useEffect(() => {
     const getDatas = async () => {
       const res = await axiosClient.get("books");
       setData(res.data);
     };
     getDatas();
+  }, []);
+
+  React.useEffect(() => {
+    const userData = getLocalStorage("user-data");
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
   }, []);
 
   const handleClose = () => {
@@ -66,6 +76,12 @@ function App() {
     handleDeleteItem();
   };
 
+  const handleLogout = () => {
+    removeLocalStorage("user-data");
+    removeLocalStorage("access-token");
+    setUser({});
+  };
+
   return (
     <Box className="App">
       <Box sx={{ flexGrow: 1, marginBottom: 5 }}>
@@ -74,14 +90,33 @@ function App() {
             <Typography variant="h6" component="div">
               MVC Book Online
             </Typography>
-            <Box component="div">
-              <Button color="primary">
-                <Link to="/signin">Sign In</Link>
-              </Button>
-              <Button color="primary">
-                <Link to="/signup">Sign Up</Link>
-              </Button>
-            </Box>
+
+            {user.id ? (
+              <Box
+                component="div"
+                sx={{ display: "flex", justifyContent: "space-between" }}
+              >
+                <Typography
+                  variant="h6"
+                  component="div"
+                  sx={{ marginRight: 3 }}
+                >
+                  {user.username}
+                </Typography>
+                <Button variant="outlined" onClick={handleLogout}>
+                  Log out
+                </Button>
+              </Box>
+            ) : (
+              <Box component="div">
+                <Button color="primary">
+                  <Link to="/signin">Sign In</Link>
+                </Button>
+                <Button color="primary">
+                  <Link to="/signup">Sign Up</Link>
+                </Button>
+              </Box>
+            )}
           </Toolbar>
         </AppBar>
       </Box>

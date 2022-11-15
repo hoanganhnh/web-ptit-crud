@@ -44,7 +44,7 @@ export class AuthService {
       userId: user.id,
     });
 
-    return { accessToken };
+    return { user, accessToken };
   }
 
   async signin(authSigninDto: AuthSigninlDto) {

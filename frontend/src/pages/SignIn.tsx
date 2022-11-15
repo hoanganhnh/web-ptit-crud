@@ -12,7 +12,10 @@ import {
   Link as LinkMUI,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+
+import { setLocalStorage } from "../utils/local-storage";
 
 function Copyright(props: any) {
   return (
@@ -32,13 +35,22 @@ function Copyright(props: any) {
 const theme = createTheme();
 
 export default function SignIn() {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const navigate = useNavigate();
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
+    try {
+      const res = await axios.post("http://localhost:5000/api/auth/signin", {
+        email: data.get("email") as string,
+        password: data.get("password") as string,
+      });
+      console.log(res);
+      setLocalStorage("user-data", JSON.stringify(res.data.user));
+      setLocalStorage("access-token", JSON.stringify(res.data.accessToken));
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
