@@ -2,7 +2,9 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { AuthModule } from './modules/auth/auth.module';
 import { BooksModule } from './modules/books/books.module';
+import { UserModule } from './modules/users/user.module';
 
 @Module({
   imports: [
@@ -11,6 +13,8 @@ import { BooksModule } from './modules/books/books.module';
       isGlobal: true,
     }),
     BooksModule,
+    UserModule,
+    AuthModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
