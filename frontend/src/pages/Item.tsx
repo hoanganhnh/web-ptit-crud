@@ -16,7 +16,7 @@ import {
 import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import MuiAlert from "@mui/material/Alert";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import dayjs, { Dayjs } from "dayjs";
 import axios from "axios";
 
@@ -26,6 +26,8 @@ import FileUpload, {
   FileUploadProps,
 } from "../components/file-upload/FileUpload";
 import FileUploadv2 from "../components/file-upload-v2/FileUploadv2";
+import { isAuthenticated } from "../stores/slices/auth";
+import { useAppSelector } from "../stores";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
@@ -33,7 +35,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 ) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
-
+// @TODO: validation
 function Item() {
   const [open, setOpen] = React.useState(false);
   const [errorSave, setErrorSave] = React.useState(false);
@@ -57,6 +59,18 @@ function Item() {
   const { idItem } = useParams();
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isAuthen = useAppSelector(isAuthenticated);
+
+  React.useEffect(() => {
+    if (!isAuthen) {
+      navigate("/signin", {
+        replace: true,
+        state: { from: location },
+      });
+    }
+  }, [isAuthen]);
 
   React.useEffect(() => {
     if (idItem) {
@@ -82,10 +96,7 @@ function Item() {
 
   const addNewItem = async (data: any) => {
     try {
-      const response = await axios.post(
-        `http://localhost:5000/api/books`,
-        data
-      );
+      const response = await axiosClient.post("books", data);
 
       if (response.status === 201) {
         setOpen(true);
@@ -101,13 +112,7 @@ function Item() {
 
   const updateItem = async (data: Book) => {
     try {
-      // @TODO: update axios instance
-      const response = await axios.patch(
-        `http://localhost:5000/api/books/${idItem}`,
-        data
-      );
-
-      // const response = await axiosClient.patch(`books/${idItem}`, data);
+      const response = await axiosClient.patch(`books/${idItem}`, data);
 
       if (response.status === 200) {
         setUpdate(true);

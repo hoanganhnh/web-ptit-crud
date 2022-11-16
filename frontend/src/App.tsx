@@ -18,21 +18,26 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import axiosClient from "./services/axios-client";
 import Book from "./types/type-book";
-import { getLocalStorage, removeLocalStorage } from "./utils/local-storage";
+import { useAppDispatch, useAppSelector } from "./stores";
+import { isAuthenticated, logout, selectAuth } from "./stores/slices/auth";
 
 import "./styles/App.css";
 
 function App() {
-  const navigate = useNavigate();
   const [data, setData] = React.useState<(Book & { id: number })[]>([]);
   const [open, setOpen] = React.useState(false);
   const [itemId, setItemId] = React.useState<number>(0);
 
-  const [user, setUser] = React.useState({});
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const dispatch = useAppDispatch();
+  const { auth: user } = useAppSelector(selectAuth);
+  const isAuthen = useAppSelector(isAuthenticated);
 
   React.useEffect(() => {
     const getDatas = async () => {
@@ -40,13 +45,6 @@ function App() {
       setData(res.data);
     };
     getDatas();
-  }, []);
-
-  React.useEffect(() => {
-    const userData = getLocalStorage("user-data");
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
   }, []);
 
   const handleClose = () => {
@@ -58,6 +56,13 @@ function App() {
   };
 
   const editItem = (id: number) => {
+    if (!isAuthen) {
+      navigate("/signin", {
+        replace: true,
+        state: { from: location },
+      });
+      return;
+    }
     navigate(`/action/${id}`);
   };
 
@@ -67,6 +72,13 @@ function App() {
   };
 
   const deleleItem = (id: number) => {
+    if (!isAuthen) {
+      navigate("/signin", {
+        replace: true,
+        state: { from: location },
+      });
+      return;
+    }
     setOpen(true);
     setItemId(id);
   };
@@ -77,9 +89,7 @@ function App() {
   };
 
   const handleLogout = () => {
-    removeLocalStorage("user-data");
-    removeLocalStorage("access-token");
-    setUser({});
+    dispatch(logout());
   };
 
   return (
@@ -91,7 +101,7 @@ function App() {
               MVC Book Online
             </Typography>
 
-            {user.id ? (
+            {isAuthen && user !== null ? (
               <Box
                 component="div"
                 sx={{ display: "flex", justifyContent: "space-between" }}

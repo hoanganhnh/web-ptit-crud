@@ -12,10 +12,14 @@ import {
   Link as LinkMUI,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { setLocalStorage } from "../utils/local-storage";
+import axiosClient from "../services/axios-client";
+import { login, setAuth, setToken } from "../stores/slices/auth";
+import { ILogin } from "../shared/interface/auth";
+import { unwrapResult } from "@reduxjs/toolkit";
+import { useAppDispatch } from "../stores";
 
 function Copyright(props: any) {
   return (
@@ -33,21 +37,32 @@ function Copyright(props: any) {
 }
 
 const theme = createTheme();
-
+// @TODO: validation
 export default function SignIn() {
+  const dispatch = useAppDispatch();
+
   const navigate = useNavigate();
+  const location = useLocation();
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/signin", {
+      const values: ILogin = {
         email: data.get("email") as string,
         password: data.get("password") as string,
-      });
-      console.log(res);
-      setLocalStorage("user-data", JSON.stringify(res.data.user));
-      setLocalStorage("access-token", JSON.stringify(res.data.accessToken));
-      navigate("/");
+      };
+      const res = await dispatch(login(values));
+      const { user, accessToken } = unwrapResult(res);
+      dispatch(setAuth(user));
+      dispatch(setToken(accessToken));
+
+      if (user && location.state?.from?.pathname) {
+        navigate(location.state.from.pathname);
+      } else {
+        // comeback to home page
+        navigate("/");
+      }
     } catch (error) {
       console.log(error);
     }

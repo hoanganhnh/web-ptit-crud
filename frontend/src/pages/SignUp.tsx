@@ -13,10 +13,11 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { unwrapResult } from "@reduxjs/toolkit";
 
-import axiosClient from "../services/axios-client";
-import { setLocalStorage } from "../utils/local-storage";
+import { ISignUp } from "../shared/interface/auth";
+import { setAuth, setToken, signup } from "../stores/slices/auth";
+import { useAppDispatch } from "../stores";
 
 function Copyright(props: any) {
   return (
@@ -35,12 +36,9 @@ function Copyright(props: any) {
 
 const theme = createTheme();
 
+// @TODO: validation
 export default function SignUp() {
-  // const [signUpData, setSignUpData] = React.useState({
-  //   email: "",
-  //   password: "",
-  //   username: "",
-  // });
+  const dispatch = useAppDispatch();
 
   const navigate = useNavigate();
 
@@ -49,14 +47,16 @@ export default function SignUp() {
     const data = new FormData(event.currentTarget);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/signup", {
+      const values: ISignUp = {
         email: data.get("email") as string,
         password: data.get("password") as string,
         username: data.get("username") as string,
-      });
-      console.log(res);
-      setLocalStorage("user-data", JSON.stringify(res.data.user));
-      setLocalStorage("access-token", JSON.stringify(res.data.accessToken));
+      };
+      const res = await dispatch(signup(values));
+      const { user, accessToken } = unwrapResult(res);
+      dispatch(setAuth(user));
+      dispatch(setToken(accessToken));
+
       navigate("/");
     } catch (error) {
       console.log(error);
