@@ -1,5 +1,11 @@
 import { Type } from 'class-transformer';
-import { IsDate, IsInt, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsDate,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateBookDto {
   @IsNotEmpty()
@@ -23,4 +29,8 @@ export class CreateBookDto {
   @IsNotEmpty()
   @IsString()
   category: string;
+
+  @IsString()
+  @IsOptional()
+  imageId: string;
 }

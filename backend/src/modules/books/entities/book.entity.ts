@@ -1,4 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+
+import { LocalFile } from './local-file.entity';
 
 @Entity({ name: 'books' })
 export class Book {
@@ -22,4 +30,12 @@ export class Book {
 
   @Column()
   category: string;
+
+  @OneToOne(() => LocalFile, (localFile) => localFile.id, {
+    nullable: true,
+    onDelete: 'SET NULL',
+    eager: true,
+  })
+  @JoinColumn()
+  image: LocalFile;
 }
