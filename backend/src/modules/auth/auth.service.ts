@@ -25,12 +25,20 @@ export class AuthService {
       authCredentialDto.password,
     );
 
-    const userExisted = await this.userService.findOneUser({
+    const emailExisted = await this.userService.findOneUser({
       where: { email: authCredentialDto.email },
     });
 
-    if (userExisted) {
+    if (emailExisted) {
       throw new BadRequestException('Email is existed !');
+    }
+
+    const usernameExisted = await this.userService.findOneUser({
+      where: { username: authCredentialDto.username },
+    });
+
+    if (usernameExisted) {
+      throw new BadRequestException('Username is existed !');
     }
 
     const roles = [Role.USER];
