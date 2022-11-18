@@ -41,6 +41,9 @@ export class BooksController {
           callback(null, `${filename}${extension}`);
         },
       }),
+      limits: {
+        fileSize: Math.pow(1024, 2),
+      },
     }),
   )
   async createImageBook(
@@ -88,6 +91,9 @@ export class BooksController {
           callback(null, `${filename}${extension}`);
         },
       }),
+      limits: {
+        fileSize: Math.pow(1024, 2),
+      },
     }),
   )
   async addImg(

@@ -36,6 +36,7 @@ function FileUploadv2({
 
   const onClearImg = () => {
     setImageUrl("");
+    getImageItem(null);
   };
 
   return (
