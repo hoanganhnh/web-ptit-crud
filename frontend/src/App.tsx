@@ -21,14 +21,14 @@ import {
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import axiosClient from "./services/axios-client";
-import Book from "./types/type-book";
 import { useAppDispatch, useAppSelector } from "./stores";
 import { isAuthenticated, logout, selectAuth } from "./stores/slices/auth";
+import { IBook } from "./shared/interface/book";
 
 import "./styles/App.css";
 
 function App() {
-  const [data, setData] = React.useState<(Book & { id: number })[]>([]);
+  const [data, setData] = React.useState<IBook[]>([]);
   const [open, setOpen] = React.useState(false);
   const [itemId, setItemId] = React.useState<number>(0);
 
@@ -147,7 +147,7 @@ function App() {
               <TableCell align="center">public date</TableCell>
               <TableCell align="center">page</TableCell>
               <TableCell align="center">category</TableCell>
-              <TableCell align="center">Action</TableCell>
+              {isAuthen ? <TableCell align="center">Action</TableCell> : null}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -163,18 +163,25 @@ function App() {
                 </TableCell>
                 <TableCell align="center">{row.page}</TableCell>
                 <TableCell align="center">{row.category}</TableCell>
-                <TableCell align="center">
-                  <Button
-                    variant="contained"
-                    onClick={() => editItem(row.id)}
-                    sx={{ marginRight: "16px" }}
-                  >
-                    Edit
-                  </Button>
-                  <Button variant="outlined" onClick={() => deleleItem(row.id)}>
-                    Delete
-                  </Button>
-                </TableCell>
+                {isAuthen ? (
+                  <>
+                    <TableCell align="center">
+                      <Button
+                        variant="contained"
+                        onClick={() => editItem(row.id)}
+                        sx={{ marginRight: "16px" }}
+                      >
+                        View
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        onClick={() => deleleItem(row.id)}
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </>
+                ) : null}
               </TableRow>
             ))}
           </TableBody>

@@ -10,14 +10,34 @@ import {
   Button,
   Grid,
   Link as LinkMUI,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { Link, useNavigate } from "react-router-dom";
 import { unwrapResult } from "@reduxjs/toolkit";
+import { useFormik } from "formik";
+import * as yup from "yup";
 
-import { ISignUp } from "../shared/interface/auth";
 import { setAuth, setToken, signup } from "../stores/slices/auth";
 import { useAppDispatch } from "../stores";
+import { VisibilityOff, Visibility } from "@mui/icons-material";
+
+const validationSchema = yup.object({
+  email: yup
+    .string()
+    .email("Enter a valid email")
+    .required("Email is required"),
+  username: yup.string().required("Username is required"),
+  password: yup
+    .string()
+    .min(6, "Password should be of minimum 6 characters length")
+    .required("Password is required"),
+  confirmPassword: yup
+    .string()
+    .min(6, "Confirm password should be of minimum 6 characters length")
+    .oneOf([yup.ref("password"), null], "Confirm password must match password"),
+});
 
 function Copyright(props: any) {
   return (
@@ -38,30 +58,56 @@ const theme = createTheme();
 
 // @TODO: validation
 export default function SignUp() {
+  const [showPassword, setShowPassword] = React.useState<boolean>(false);
+  const [showConfirmPassword, setConfirmPassword] =
+    React.useState<boolean>(false);
+
   const dispatch = useAppDispatch();
 
   const navigate = useNavigate();
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+      password: "",
+      username: "",
+      confirmPassword: "",
+    },
+    validationSchema: validationSchema,
+    onSubmit: async ({ confirmPassword, ...values }) => {
+      try {
+        const res = await dispatch(signup(values));
+        const { user, accessToken } = unwrapResult(res);
+        dispatch(setAuth(user));
+        dispatch(setToken(accessToken));
 
-    try {
-      const values: ISignUp = {
-        email: data.get("email") as string,
-        password: data.get("password") as string,
-        username: data.get("username") as string,
-      };
-      const res = await dispatch(signup(values));
-      const { user, accessToken } = unwrapResult(res);
-      dispatch(setAuth(user));
-      dispatch(setToken(accessToken));
+        navigate("/");
+      } catch (error: any) {
+        console.log(error);
+        if (
+          error.statusCode == 400 &&
+          error.message.toLowerCase().includes("email")
+        ) {
+          formik.setFieldError("email", error.message);
+        }
 
-      navigate("/");
-    } catch (error) {
-      console.log(error);
-    }
-  };
+        if (
+          error.statusCode == 400 &&
+          error.message.toLowerCase().includes("username")
+        ) {
+          formik.setFieldError("username", error.message);
+        }
+      }
+    },
+  });
+
+  const toggleShowPassword = React.useCallback(() => {
+    setShowPassword(!showPassword);
+  }, [showPassword]);
+
+  const toggleShowConfirmPassword = React.useCallback(() => {
+    setConfirmPassword(!showConfirmPassword);
+  }, [showConfirmPassword]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -83,7 +129,7 @@ export default function SignUp() {
           </Typography>
           <Box
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={formik.handleSubmit}
             noValidate
             sx={{ mt: 1 }}
           >
@@ -92,10 +138,12 @@ export default function SignUp() {
               required
               fullWidth
               id="email"
-              label="Email Address"
               name="email"
-              autoComplete="email"
-              autoFocus
+              label="Email"
+              value={formik.values.email}
+              onChange={formik.handleChange}
+              error={formik.touched.email && Boolean(formik.errors.email)}
+              helperText={formik.touched.email && formik.errors.email}
             />
             <TextField
               margin="normal"
@@ -104,26 +152,69 @@ export default function SignUp() {
               id="username"
               label="Username"
               name="username"
+              value={formik.values.username}
+              onChange={formik.handleChange}
+              error={formik.touched.username && Boolean(formik.errors.username)}
+              helperText={formik.touched.username && formik.errors.username}
             />
             <TextField
               margin="normal"
               required
               fullWidth
+              id="password"
               name="password"
               label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
+              type={showPassword ? "text" : "password"}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={toggleShowPassword}
+                      onMouseDown={toggleShowPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              value={formik.values.password}
+              onChange={formik.handleChange}
+              error={formik.touched.password && Boolean(formik.errors.password)}
+              helperText={formik.touched.password && formik.errors.password}
             />
             <TextField
               margin="normal"
               required
               fullWidth
-              name="confirm-password"
-              label="Confirm Password"
-              type="password"
               id="confirm-password"
-              autoComplete="current-password"
+              name="confirmPassword"
+              label="Confirm Password"
+              type={showConfirmPassword ? "text" : "password"}
+              value={formik.values.confirmPassword}
+              onChange={formik.handleChange}
+              error={
+                formik.touched.confirmPassword &&
+                Boolean(formik.errors.confirmPassword)
+              }
+              helperText={
+                formik.touched.confirmPassword && formik.errors.confirmPassword
+              }
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={toggleShowConfirmPassword}
+                      onMouseDown={toggleShowConfirmPassword}
+                      edge="end"
+                    >
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
             <Button
               type="submit"

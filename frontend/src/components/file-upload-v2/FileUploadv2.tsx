@@ -7,14 +7,28 @@ import "./FileUploadv2.css";
 
 interface FileUploadv2Props {
   accept?: string;
+  url?: string;
+  labelText?: string;
+  getImageItem: (file: File) => void;
 }
 
-function FileUploadv2({ accept = "image/*" }: FileUploadv2Props) {
-  const labelText = "Click or drag to upload file";
-  const [imageUrl, setImageUrl] = React.useState<string>("");
+function FileUploadv2({
+  accept = "image/*",
+  labelText = "Click or drag to upload file",
+  url,
+  getImageItem,
+}: FileUploadv2Props) {
+  const [imageUrl, setImageUrl] = React.useState<string | undefined>(() => url);
+
+  React.useEffect(() => {
+    setImageUrl(url);
+  }, [url]);
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files !== null && event.target.files[0]) {
-      setImageUrl(URL.createObjectURL(event.target.files[0]));
+      const imgUrl = URL.createObjectURL(event.target.files[0]);
+      setImageUrl(imgUrl);
+      getImageItem(event.target.files[0]);
       //   @ts-ignore
       event.target.value = [];
     }
