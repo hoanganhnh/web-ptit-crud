@@ -33,7 +33,6 @@ export class Book {
 
   @OneToOne(() => LocalFile, (localFile) => localFile.id, {
     nullable: true,
-    onDelete: 'SET NULL',
     eager: true,
   })
   @JoinColumn()

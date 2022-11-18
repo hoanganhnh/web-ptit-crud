@@ -19,12 +19,15 @@ export class BooksService {
   ) {}
 
   async create(createBookDto: CreateBookDto) {
-    const book = await this.bookRepository.create({
-      ...createBookDto,
-      image: {
-        id: createBookDto.imageId,
-      },
-    });
+    const dto = createBookDto.imageId
+      ? {
+          ...createBookDto,
+          image: {
+            id: createBookDto.imageId,
+          },
+        }
+      : { ...createBookDto };
+    const book = await this.bookRepository.create(dto);
 
     return await this.bookRepository.save(book);
   }
