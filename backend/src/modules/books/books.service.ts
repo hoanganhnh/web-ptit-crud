@@ -79,4 +79,17 @@ export class BooksService {
     });
     return await this.bookRepository.save(book);
   }
+
+  async removeImgInBook(bookId: number) {
+    const book = await this.bookRepository.preload({
+      id: bookId,
+      image: null,
+    });
+    return await this.bookRepository.save(book);
+  }
+
+  async deleteLocalFile(id: string) {
+    const deleteResult = await this.localFileRepository.delete(id);
+    return deleteResult;
+  }
 }

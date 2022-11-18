@@ -34,6 +34,7 @@ export class Book {
   @OneToOne(() => LocalFile, (localFile) => localFile.id, {
     nullable: true,
     eager: true,
+    onDelete: 'SET NULL',
   })
   @JoinColumn()
   image: LocalFile;

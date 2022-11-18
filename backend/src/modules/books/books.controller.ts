@@ -96,7 +96,7 @@ export class BooksController {
       },
     }),
   )
-  async addImg(
+  async addImgBook(
     @Param('id') id: string,
     @UploadedFile('file', FileTypeImageValidationPipe, FileSizeValidationPipe)
     file: Express.Multer.File,
@@ -106,5 +106,11 @@ export class BooksController {
       filename: file.originalname,
       mimetype: file.mimetype,
     });
+  }
+
+  @Delete('image/:id')
+  async deleteLocalFile(@Param('id') id: string) {
+    const result = await this.booksService.deleteLocalFile(id);
+    return result;
   }
 }
