@@ -33,6 +33,7 @@ const validationSchema = yup.object({
 function Item() {
   const [imgFile, setImgFile] = React.useState<File | null>(null);
   const [imageUrl, setImageUrl] = React.useState<string>("");
+  const [imageId, setImageId] = React.useState<string>("");
   const [disabled, setDisabled] = React.useState<boolean>(true);
   const [publicDate, setPublicDate] = React.useState<Dayjs | null>(null);
 
@@ -58,7 +59,6 @@ function Item() {
     try {
       const { data } = await axiosClient.post(`books/image`, formdata);
 
-      console.log(data);
       return data as IImgageBook;
     } catch (error: any) {
       console.log(error);
@@ -69,7 +69,7 @@ function Item() {
     }
   };
 
-  const handleUpdateImage = async (bookId: string, image: File) => {
+  const handleUpdateBookWithImage = async (bookId: string, image: File) => {
     const formdata = new FormData();
     formdata.append("file", image);
 
@@ -78,8 +78,6 @@ function Item() {
         `books/image/${bookId}`,
         formdata
       );
-      console.log(data);
-
       return data as IBook;
     } catch (error: any) {
       if (error.response.status === 413) {
@@ -119,21 +117,31 @@ function Item() {
       if (idItem) {
         if (imgFile === null) {
           const response = await axiosClient.patch(`books/${idItem}`, data);
+
+          if (!imageUrl) {
+            // delete image in book
+            await axiosClient.delete(`books/image/${imageId}`);
+          }
           if (response.status === 200) {
-            console.log("update success full");
+            console.log("update successfull");
+            toast.success("Update Book Successfull !");
           }
         } else {
-          const updateImage = await handleUpdateImage(
+          const book = await handleUpdateBookWithImage(
             idItem as string,
             imgFile
           );
-          console.log(updateImage);
+          if (book) {
+            console.log("Update book with image");
+            toast.success("Update Book With Image Successfull !");
+          }
         }
       }
     } catch (error) {
       console.log(error);
     }
   };
+  console.log();
 
   const handleChangeAction = React.useCallback(() => {
     if (idItem) {
@@ -145,8 +153,11 @@ function Item() {
     }
   }, [idItem, disabled]);
 
-  const getImageFile = (file: File) => {
+  const getImageFile = (file: File | null) => {
     setImgFile(file);
+    if (file === null) {
+      setImageUrl("");
+    }
   };
 
   const formik = useFormik({
@@ -186,6 +197,7 @@ function Item() {
 
     if (image) {
       setImageUrl(image.path);
+      setImageId(image.id);
     }
 
     formik.setValues({

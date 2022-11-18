@@ -9,7 +9,7 @@ interface FileUploadv2Props {
   accept?: string;
   url?: string;
   labelText?: string;
-  getImageItem: (file: File) => void;
+  getImageItem: (file: File | null) => void;
 }
 
 function FileUploadv2({
