@@ -13,4 +13,7 @@ export class LocalFile {
 
   @Column()
   mimetype: string;
+
+  @Column()
+  url: string;
 }

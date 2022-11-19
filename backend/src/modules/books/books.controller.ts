@@ -8,6 +8,8 @@ import {
   Delete,
   UploadedFile,
   UseInterceptors,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -51,7 +53,7 @@ export class BooksController {
     file: Express.Multer.File,
   ) {
     const localFile = await this.booksService.createLocalFile({
-      path: file.path.replace('public', ''),
+      path: file.path,
       filename: file.originalname,
       mimetype: file.mimetype,
     });
@@ -74,6 +76,7 @@ export class BooksController {
     return this.booksService.update(+id, updateBookDto);
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.booksService.remove(+id);
@@ -102,7 +105,7 @@ export class BooksController {
     file: Express.Multer.File,
   ) {
     return this.booksService.addImg(+id, {
-      path: file.path.replace('public', ''),
+      path: file.path,
       filename: file.originalname,
       mimetype: file.mimetype,
     });
