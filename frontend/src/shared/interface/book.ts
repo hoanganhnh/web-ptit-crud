@@ -14,4 +14,5 @@ export interface IImgageBook {
   filename: string;
   path: string;
   mimetype: string;
+  url: string;
 }

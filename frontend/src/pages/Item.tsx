@@ -115,23 +115,33 @@ function Item() {
   const updateItem = async (data: Omit<IBook, "id" | "image">) => {
     try {
       if (idItem) {
+        // update and remove image
         if (imgFile === null) {
           const response = await axiosClient.patch(`books/${idItem}`, data);
 
-          if (!imageUrl) {
+          if (!imageUrl && imageId) {
             // delete image in book
             await axiosClient.delete(`books/image/${imageId}`);
+            setImageId("");
+            toast.success("Delete Image Book Successfull !");
           }
           if (response.status === 200) {
             console.log("update successfull");
             toast.success("Update Book Successfull !");
           }
         } else {
+          // update with image
+          if (imageId) {
+            // delete image previous
+            await axiosClient.delete(`books/image/${imageId}`);
+          }
           const book = await handleUpdateBookWithImage(
             idItem as string,
             imgFile
           );
+
           if (book) {
+            setImageId(book.image.id);
             console.log("Update book with image");
             toast.success("Update Book With Image Successfull !");
           }
@@ -141,7 +151,6 @@ function Item() {
       console.log(error);
     }
   };
-  console.log();
 
   const handleChangeAction = React.useCallback(() => {
     if (idItem) {
@@ -196,7 +205,7 @@ function Item() {
     }: { data: IBook } = await axiosClient.get(`books/${id}`);
 
     if (image) {
-      setImageUrl(image.path);
+      setImageUrl(image.url);
       setImageId(image.id);
     }
 
@@ -330,7 +339,7 @@ function Item() {
               sx={{ marginTop: "24px" }}
               onClick={handleChangeAction}
             >
-              {idItem ? (disabled ? "Edit" : "Update") : "Add"}
+              {idItem ? (disabled ? "Edit" : "Save") : "Add"}
             </Button>
           </Box>
         </Grid>

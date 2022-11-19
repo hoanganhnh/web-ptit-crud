@@ -136,7 +136,7 @@ function App() {
         sx={{ marginBottom: "40px" }}
         onClick={addNew}
       >
-        New Book
+        Add Book
       </Button>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 1200 }} aria-label="simple table">
@@ -147,7 +147,7 @@ function App() {
               <TableCell align="center">public date</TableCell>
               <TableCell align="center">page</TableCell>
               <TableCell align="center">category</TableCell>
-              {isAuthen ? <TableCell align="center">Action</TableCell> : null}
+              <TableCell align="center">Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -163,9 +163,9 @@ function App() {
                 </TableCell>
                 <TableCell align="center">{row.page}</TableCell>
                 <TableCell align="center">{row.category}</TableCell>
-                {isAuthen ? (
-                  <>
-                    <TableCell align="center">
+                <TableCell align="center">
+                  {isAuthen ? (
+                    <>
                       <Button
                         variant="contained"
                         onClick={() => editItem(row.id)}
@@ -179,9 +179,9 @@ function App() {
                       >
                         Delete
                       </Button>
-                    </TableCell>
-                  </>
-                ) : null}
+                    </>
+                  ) : null}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
