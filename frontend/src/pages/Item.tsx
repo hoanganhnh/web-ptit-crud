@@ -239,37 +239,54 @@ function Item() {
             marginBottom={2}
             color="GrayText"
           >
-            Book action
+            Book Action
           </Typography>
           <Box component="form" onSubmit={formik.handleSubmit}>
-            <InputLabel htmlFor="title">title</InputLabel>
-            <TextField
-              fullWidth
-              id="title"
-              name="title"
-              color="primary"
-              placeholder="title"
-              disabled={disabled}
-              value={formik.values.title}
-              onChange={formik.handleChange}
-              error={formik.touched.title && Boolean(formik.errors.title)}
-              helperText={formik.touched.title && formik.errors.title}
-            />
-            <InputLabel htmlFor="author">author</InputLabel>
-            <TextField
-              id="author"
-              aria-describedby="my-helper-text"
-              color="primary"
-              name="author"
-              fullWidth
-              placeholder="author"
-              disabled={disabled}
-              value={formik.values.author}
-              onChange={formik.handleChange}
-              error={formik.touched.author && Boolean(formik.errors.author)}
-              helperText={formik.touched.author && formik.errors.author}
-            />
-            <InputLabel htmlFor="description">description</InputLabel>
+            <Box component="div" sx={{ display: "flex", marginBottom: 2 }}>
+              <Box
+                component="div"
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  flex: 1,
+                  marginRight: 1,
+                }}
+              >
+                <InputLabel htmlFor="title">Title</InputLabel>
+                <TextField
+                  fullWidth
+                  id="title"
+                  name="title"
+                  color="primary"
+                  placeholder="title"
+                  disabled={disabled}
+                  value={formik.values.title}
+                  onChange={formik.handleChange}
+                  error={formik.touched.title && Boolean(formik.errors.title)}
+                  helperText={formik.touched.title && formik.errors.title}
+                />
+              </Box>
+              <Box
+                component="div"
+                sx={{ display: "flex", flexDirection: "column", flex: 1 }}
+              >
+                <InputLabel htmlFor="author">Author</InputLabel>
+                <TextField
+                  id="author"
+                  aria-describedby="my-helper-text"
+                  color="primary"
+                  name="author"
+                  fullWidth
+                  placeholder="author"
+                  disabled={disabled}
+                  value={formik.values.author}
+                  onChange={formik.handleChange}
+                  error={formik.touched.author && Boolean(formik.errors.author)}
+                  helperText={formik.touched.author && formik.errors.author}
+                />
+              </Box>
+            </Box>
+            <InputLabel htmlFor="description">Description</InputLabel>
             <TextField
               id="description"
               name="description"
@@ -285,42 +302,67 @@ function Item() {
               value={formik.values.description}
               onChange={formik.handleChange}
             />
-            <InputLabel htmlFor="publicDate">publicDate</InputLabel>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DesktopDatePicker
-                inputFormat="DD/MM/YYYY"
-                disabled={disabled}
-                value={publicDate}
-                onChange={handleChangeDate}
-                onError={(a) => {
-                  console.log(a);
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    name="publicDate"
-                    required
-                    fullWidth
-                    disabled={disabled}
-                    onChange={formik.handleChange}
-                  />
-                )}
-              />
-            </LocalizationProvider>
-            <InputLabel id="category-id">category</InputLabel>
-            <Select
-              labelId="category-id"
-              id="demo-simple-select-autowidth"
-              value={formik.values.category}
-              onChange={handleChangeCategory}
-              fullWidth
-              disabled={disabled}
+            <Box
+              component="div"
+              sx={{ display: "flex", marginBottom: 2, margin: "20px 0 20px 0" }}
             >
-              <MenuItem value={"Coding"}>Coding</MenuItem>
-              <MenuItem value={"Hacking"}>Hacking</MenuItem>
-              <MenuItem value={"Debuger"}>Debuger</MenuItem>
-            </Select>
-            <InputLabel htmlFor="page">page</InputLabel>
+              <Box
+                component="div"
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  flex: 1,
+                  marginRight: 1,
+                }}
+              >
+                <InputLabel htmlFor="publicDate">Public Date</InputLabel>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DesktopDatePicker
+                    inputFormat="DD/MM/YYYY"
+                    disabled={disabled}
+                    value={publicDate}
+                    onChange={handleChangeDate}
+                    onError={(a) => {
+                      console.log(a);
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        name="publicDate"
+                        required
+                        fullWidth
+                        disabled={disabled}
+                        onChange={formik.handleChange}
+                      />
+                    )}
+                  />
+                </LocalizationProvider>
+              </Box>
+              <Box
+                component="div"
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  flex: 1,
+                  marginRight: 1,
+                }}
+              >
+                <InputLabel id="category-id">Category</InputLabel>
+                <Select
+                  labelId="category-id"
+                  id="demo-simple-select-autowidth"
+                  value={formik.values.category}
+                  onChange={handleChangeCategory}
+                  fullWidth
+                  disabled={disabled}
+                >
+                  <MenuItem value={"Coding"}>Coding</MenuItem>
+                  <MenuItem value={"Hacking"}>Hacking</MenuItem>
+                  <MenuItem value={"Debuger"}>Debuger</MenuItem>
+                </Select>
+              </Box>
+            </Box>
+            <InputLabel htmlFor="page">Page</InputLabel>
             <TextField
               id="page"
               name="page"
