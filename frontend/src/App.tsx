@@ -132,7 +132,7 @@ function App() {
       </Box>
       <Button
         variant="contained"
-        color="success"
+        color="primary"
         sx={{ marginBottom: "40px" }}
         onClick={addNew}
       >
