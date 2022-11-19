@@ -278,6 +278,9 @@ function Item() {
               fullWidth
               type="string"
               placeholder="description"
+              multiline
+              minRows={5}
+              maxRows={10}
               disabled={disabled}
               value={formik.values.description}
               onChange={formik.handleChange}
