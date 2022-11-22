@@ -142,12 +142,24 @@ function App() {
         <Table sx={{ minWidth: 1200 }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell align="center">title</TableCell>
-              <TableCell align="center">author</TableCell>
-              <TableCell align="center">public date</TableCell>
-              <TableCell align="center">page</TableCell>
-              <TableCell align="center">category</TableCell>
-              <TableCell align="center">Action</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "600" }}>
+                Title
+              </TableCell>
+              <TableCell align="center" sx={{ fontWeight: "600" }}>
+                Author
+              </TableCell>
+              <TableCell align="center" sx={{ fontWeight: "600" }}>
+                Public date
+              </TableCell>
+              <TableCell align="center" sx={{ fontWeight: "600" }}>
+                Page
+              </TableCell>
+              <TableCell align="center" sx={{ fontWeight: "600" }}>
+                Category
+              </TableCell>
+              <TableCell align="center" sx={{ fontWeight: "600" }}>
+                Action
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
