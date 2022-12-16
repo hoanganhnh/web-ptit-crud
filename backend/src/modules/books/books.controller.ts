@@ -21,16 +21,20 @@ import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { FileSizeValidationPipe } from './pipes/file-size-validation.pipe';
 import { FileTypeImageValidationPipe } from './pipes/file-type-image.pipe';
+import { Auth } from '../../common/decorators/auth.decorator';
+import { Role } from '../../shared/enum/role';
 
 @Controller('books')
 export class BooksController {
   constructor(private readonly booksService: BooksService) {}
 
+  @Auth(Role.ADMIN)
   @Post()
   create(@Body() createBookDto: CreateBookDto) {
     return this.booksService.create(createBookDto);
   }
 
+  @Auth(Role.ADMIN)
   @Post('image')
   @UseInterceptors(
     FileInterceptor('file', {
@@ -71,17 +75,20 @@ export class BooksController {
     return this.booksService.findOneById(+id);
   }
 
+  @Auth(Role.ADMIN)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
     return this.booksService.update(+id, updateBookDto);
   }
 
+  @Auth(Role.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.booksService.remove(+id);
   }
 
+  @Auth(Role.ADMIN)
   @Post('image/:id')
   @UseInterceptors(
     FileInterceptor('file', {
@@ -111,6 +118,7 @@ export class BooksController {
     });
   }
 
+  @Auth(Role.ADMIN)
   @Delete('image/:id')
   async deleteLocalFile(@Param('id') id: string) {
     const result = await this.booksService.deleteLocalFile(id);
