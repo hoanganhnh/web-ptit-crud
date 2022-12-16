@@ -1,7 +1,7 @@
 export interface IUser {
   user: {
     id: string;
-    username: "Huong";
+    username: string;
     email: string;
     roles: string[];
   };

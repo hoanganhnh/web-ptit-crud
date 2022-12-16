@@ -12,17 +12,15 @@ import {
 } from "@mui/material";
 import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import dayjs, { Dayjs } from "dayjs";
 import { useFormik } from "formik";
 import * as yup from "yup";
 
-import axiosClient from "../services/axios-client";
-import FileUploadv2 from "../components/file-upload-v2/FileUploadv2";
-import { isAuthenticated } from "../stores/slices/auth";
-import { useAppSelector } from "../stores";
-import { IBook, IImgageBook } from "../shared/interface/book";
+import axiosClient from "../../services/axios-client";
+import FileUploadv2 from "../../components/file-upload-v2/FileUploadv2";
+import { IBook, IImgageBook } from "../../shared/interface/book";
 
 const validationSchema = yup.object({
   title: yup.string().required("This field is required"),
@@ -30,7 +28,7 @@ const validationSchema = yup.object({
   publicDate: yup.string().required("This field is required"),
 });
 
-function Item() {
+function ItemPage() {
   const [imgFile, setImgFile] = React.useState<File | null>(null);
   const [imageUrl, setImageUrl] = React.useState<string>("");
   const [imageId, setImageId] = React.useState<string>("");
@@ -40,18 +38,6 @@ function Item() {
   const { idItem } = useParams();
 
   const navigate = useNavigate();
-  const location = useLocation();
-
-  const isAuthen = useAppSelector(isAuthenticated);
-
-  React.useEffect(() => {
-    if (!isAuthen) {
-      navigate("/signin", {
-        replace: true,
-        state: { from: location },
-      });
-    }
-  }, [isAuthen]);
 
   const handleAddImage = async (image: File) => {
     const formdata = new FormData();
@@ -415,4 +401,4 @@ function Item() {
   );
 }
 
-export default Item;
+export default ItemPage;

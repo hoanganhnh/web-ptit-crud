@@ -3,6 +3,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosClient from "../../services/axios-client";
 import { ILogin, ISignUp } from "../../shared/interface/auth";
 import { IUser } from "../../shared/interface/user";
+import { Role } from "../../shared/types/Role";
 import { RootState } from "../store";
 
 export const login = createAsyncThunk(
@@ -73,6 +74,16 @@ const authSlice = createSlice({
 });
 
 export const selectAuth = (state: RootState) => state.auth;
+
+export const selectAdmin = (state: RootState) => {
+  const roles = state.auth.auth?.roles;
+
+  if (roles) {
+    return roles.includes(Role.ADMIN);
+  }
+
+  return false;
+};
 
 export const isAuthenticated = (state: RootState) => {
   const currentUser = selectAuth(state);
