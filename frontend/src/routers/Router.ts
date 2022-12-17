@@ -1,3 +1,10 @@
 export const Router = {
-  home: "/home",
+  home: "/",
+  order: "/order",
+  profile: "/profile",
+  admin: {
+    dashboard: "/admin",
+    // CRUD book
+    action: "/action",
+  },
 };

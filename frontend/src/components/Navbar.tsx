@@ -1,10 +1,28 @@
-import { AppBar, CssBaseline, Toolbar, Typography } from "@mui/material";
+import {
+  AppBar,
+  Badge,
+  Box,
+  Button,
+  Container,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 import { Link } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+
+import { Router } from "../routers/Router";
+import { useAppDispatch, useAppSelector } from "../stores";
+import { isAuthenticated, logout, selectAdmin } from "../stores/slices/auth";
 
 const useStyles = makeStyles((theme) => ({
   container: {
     boxShadow: "none !important",
+  },
+  toolbar: {
+    padding: "0 !important",
+    justifyContent: "center",
   },
   navlinks: {
     marginLeft: 10,
@@ -20,9 +38,9 @@ const useStyles = makeStyles((theme) => ({
     textDecoration: "none",
     fontSize: "20px",
     marginLeft: 10,
+    color: "#3f51b5",
     "&:hover": {
-      // color: "yellow",
-      borderBottom: "1px solid #ddd",
+      color: "#00b0ff",
     },
   },
 }));
@@ -30,28 +48,78 @@ const useStyles = makeStyles((theme) => ({
 function Navbar() {
   const classes = useStyles();
 
+  const dispatch = useAppDispatch();
+  const isAdmin = useAppSelector(selectAdmin);
+  const isAuthen = useAppSelector(isAuthenticated);
+
+  const handleLogout = () => {
+    dispatch(logout());
+  };
+
   return (
-    <AppBar position="static" color="transparent" className={classes.container}>
-      <Toolbar>
-        <Typography variant="h4" className={classes.logo}>
-          Book Shop
-        </Typography>
-        <div className={classes.navlinks}>
-          <Link to="/" className={classes.link}>
-            Home
-          </Link>
-          <Link to="/about" className={classes.link}>
-            About
-          </Link>
-          <Link to="/contact" className={classes.link}>
-            Contact
-          </Link>
-          <Link to="/faq" className={classes.link}>
-            FAQ
-          </Link>
-        </div>
-      </Toolbar>
-    </AppBar>
+    <Container maxWidth="lg">
+      <AppBar
+        position="relative"
+        color="transparent"
+        className={classes.container}
+      >
+        <Toolbar className={classes.toolbar}>
+          <Typography variant="h4" className={classes.logo}>
+            <Link
+              to={Router.home}
+              className={classes.link}
+              style={{ margin: 0 }}
+            >
+              Book Shop
+            </Link>
+          </Typography>
+          <div className={classes.navlinks}>
+            {isAdmin && (
+              <Link to={Router.admin.dashboard} className={classes.link}>
+                Dashboard
+              </Link>
+            )}
+
+            <Link to={Router.order} className={classes.link}>
+              <Badge badgeContent={4} color="primary">
+                <ShoppingCartIcon sx={{ fontSize: "30px" }} />
+              </Badge>
+            </Link>
+
+            {isAuthen ? (
+              <Box
+                component="div"
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginLeft: 1,
+                }}
+              >
+                <Link to={Router.profile} className={classes.link}>
+                  <AccountCircleIcon sx={{ fontSize: "30px" }} />
+                </Link>
+                <Button
+                  variant="outlined"
+                  onClick={handleLogout}
+                  sx={{ marginLeft: 1 }}
+                >
+                  Log out
+                </Button>
+              </Box>
+            ) : (
+              <Box component="div" sx={{ marginLeft: 2 }}>
+                <Button color="primary">
+                  <Link to="/signin">Sign In</Link>
+                </Button>
+                <Button color="primary">
+                  <Link to="/signup">Sign Up</Link>
+                </Button>
+              </Box>
+            )}
+          </div>
+        </Toolbar>
+      </AppBar>
+    </Container>
   );
 }
 export default Navbar;

@@ -13,6 +13,8 @@ import ProtectedRoute from "./routers/ProtectedRoute";
 import RouteAdmin from "./routers/RouteAdmin";
 import HomePage from "./pages/HomePage";
 import OrderPage from "./pages/OrderPage";
+import Profile from "./pages/Profile";
+import { Router } from "./routers/Router";
 
 function App() {
   return (
@@ -28,12 +30,13 @@ function App() {
             <Route path="/" element={<ProtectedRoute />}>
               <Route path="/" element={<RouteAdmin />}>
                 <Route index path="admin" element={<AdminDasboard />} />
-                <Route path="action">
+                <Route path={Router.admin.action}>
                   <Route index element={<ItemPage />} />
                   <Route path=":idItem" element={<ItemPage />} />
                 </Route>
               </Route>
-              <Route path="/order" element={<OrderPage />} />
+              <Route path={Router.order} element={<OrderPage />} />
+              <Route path={Router.profile} element={<Profile />} />
             </Route>
             <Route path="*" element={<div>Not found page</div>} />
           </Routes>
