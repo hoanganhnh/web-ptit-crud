@@ -1,5 +1,7 @@
 export const Router = {
   home: "/",
+  signin: "/signin",
+  signup: "/signup",
   order: "/order",
   profile: "/profile",
   admin: {

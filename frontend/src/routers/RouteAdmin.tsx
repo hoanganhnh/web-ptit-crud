@@ -3,6 +3,7 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 import { useAppSelector } from "../stores";
 import { selectAdmin } from "../stores/slices/auth";
+import { Router } from "./Router";
 
 function RouteAdmin() {
   const location = useLocation();
@@ -12,7 +13,13 @@ function RouteAdmin() {
   return isAdmin ? (
     <Outlet />
   ) : (
-    <Navigate to="/signin" replace state={{ from: location }} />
+    <Navigate
+      to={Router.signin}
+      replace
+      state={{
+        from: isAdmin ? location : { ...location, pathname: Router.home },
+      }}
+    />
   );
 }
 
