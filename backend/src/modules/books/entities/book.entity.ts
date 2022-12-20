@@ -29,6 +29,9 @@ export class Book {
   page: number;
 
   @Column()
+  price: number;
+
+  @Column()
   category: string;
 
   @OneToOne(() => LocalFile, (localFile) => localFile.id, {

@@ -6,13 +6,7 @@ export class LocalFile {
   id: string;
 
   @Column()
-  filename: string;
-
-  @Column()
   path: string;
-
-  @Column()
-  mimetype: string;
 
   @Column()
   url: string;

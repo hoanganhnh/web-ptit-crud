@@ -58,8 +58,6 @@ export class BooksController {
   ) {
     const localFile = await this.booksService.createLocalFile({
       path: file.path,
-      filename: file.originalname,
-      mimetype: file.mimetype,
     });
 
     return localFile;
@@ -113,8 +111,6 @@ export class BooksController {
   ) {
     return this.booksService.addImg(+id, {
       path: file.path,
-      filename: file.originalname,
-      mimetype: file.mimetype,
     });
   }
 

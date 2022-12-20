@@ -26,6 +26,9 @@ export class CreateBookDto {
   @IsInt()
   page: number;
 
+  @IsInt()
+  price: number;
+
   @IsNotEmpty()
   @IsString()
   category: string;
