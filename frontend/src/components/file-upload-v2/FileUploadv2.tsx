@@ -10,6 +10,7 @@ interface FileUploadv2Props {
   url?: string;
   labelText?: string;
   getImageItem: (file: File | null) => void;
+  disabled: boolean;
 }
 
 function FileUploadv2({
@@ -17,6 +18,7 @@ function FileUploadv2({
   labelText = "Click or drag to upload file",
   url,
   getImageItem,
+  disabled,
 }: FileUploadv2Props) {
   const [imageUrl, setImageUrl] = React.useState<string | undefined>(() => url);
 
@@ -48,7 +50,16 @@ function FileUploadv2({
         id="file-upload"
         type="file"
       />
-      {imageUrl ? <ClearIcon fontSize="large" onClick={onClearImg} /> : null}
+      {imageUrl ? (
+        <ClearIcon
+          sx={{
+            pointerEvents: disabled ? "none" : "inherit",
+            cursor: "pointer",
+          }}
+          fontSize="large"
+          onClick={onClearImg}
+        />
+      ) : null}
       {imageUrl ? (
         <Box position="relative">
           <img alt="file upload" src={imageUrl} className="img-preview" />

@@ -2,6 +2,7 @@ import React from "react";
 import {
   Box,
   Button,
+  Container,
   Grid,
   InputLabel,
   MenuItem,
@@ -21,6 +22,7 @@ import * as yup from "yup";
 import axiosClient from "../../services/axios-client";
 import FileUploadv2 from "../../components/file-upload-v2/FileUploadv2";
 import { IBook, IImgageBook } from "../../shared/interface/book";
+import { Router } from "../../routers/Router";
 
 const validationSchema = yup.object({
   title: yup.string().required("This field is required"),
@@ -84,13 +86,13 @@ function ItemPage() {
           });
 
           if (response.status === 201) {
-            navigate("/");
+            navigate(Router.admin.dashboard);
           }
         }
       } else {
         const response = await axiosClient.post("books", data);
         if (response.status === 201) {
-          navigate("/");
+          navigate(Router.admin.dashboard);
         }
       }
     } catch (error: any) {
@@ -162,6 +164,7 @@ function ItemPage() {
       description: "",
       publicDate: "",
       page: 1,
+      price: 1,
       category: "Coding",
     },
     validationSchema: validationSchema,
@@ -187,7 +190,16 @@ function ItemPage() {
 
   const getItemById = async (id: number) => {
     const {
-      data: { author, category, description, page, publicDate, title, image },
+      data: {
+        author,
+        category,
+        description,
+        page,
+        publicDate,
+        title,
+        image,
+        price,
+      },
     }: { data: IBook } = await axiosClient.get(`books/${id}`);
 
     if (image) {
@@ -202,6 +214,7 @@ function ItemPage() {
       page,
       publicDate: dayjs(publicDate).format(),
       title,
+      price,
     });
     setPublicDate(dayjs(publicDate));
   };
@@ -216,7 +229,7 @@ function ItemPage() {
   };
 
   return (
-    <Box>
+    <Container maxWidth="xl" sx={{ marginTop: 3 }}>
       <Grid container>
         <Grid item xs={6} justifyContent="center">
           <Typography
@@ -348,22 +361,58 @@ function ItemPage() {
                 </Select>
               </Box>
             </Box>
-            <InputLabel htmlFor="page">Page</InputLabel>
-            <TextField
-              id="page"
-              name="page"
-              aria-describedby="my-helper-text"
-              color="primary"
-              required
-              fullWidth
-              type="number"
-              placeholder="page"
-              disabled={disabled}
-              InputProps={{ inputProps: { min: 1 } }}
-              value={formik.values.page}
-              onChange={formik.handleChange}
-            />
-
+            <Box component="div" sx={{ display: "flex", marginBottom: 2 }}>
+              <Box
+                component="div"
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  flex: 1,
+                  marginRight: 1,
+                }}
+              >
+                <InputLabel htmlFor="page">Page</InputLabel>
+                <TextField
+                  id="page"
+                  name="page"
+                  aria-describedby="my-helper-text"
+                  color="primary"
+                  required
+                  fullWidth
+                  type="number"
+                  placeholder="page"
+                  disabled={disabled}
+                  InputProps={{ inputProps: { min: 1 } }}
+                  value={formik.values.page}
+                  onChange={formik.handleChange}
+                />
+              </Box>
+              <Box
+                component="div"
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  flex: 1,
+                  marginRight: 1,
+                }}
+              >
+                <InputLabel htmlFor="price">Price</InputLabel>
+                <TextField
+                  id="price"
+                  name="price"
+                  aria-describedby="my-helper-text"
+                  color="primary"
+                  required
+                  fullWidth
+                  type="number"
+                  placeholder="price"
+                  disabled={disabled}
+                  InputProps={{ inputProps: { min: 1 } }}
+                  value={formik.values.price}
+                  onChange={formik.handleChange}
+                />
+              </Box>
+            </Box>
             <Button
               variant="outlined"
               type="submit"
@@ -383,7 +432,11 @@ function ItemPage() {
           >
             Upload Image
           </Typography>
-          <FileUploadv2 url={imageUrl} getImageItem={getImageFile} />
+          <FileUploadv2
+            disabled={disabled}
+            url={imageUrl}
+            getImageItem={getImageFile}
+          />
         </Grid>
       </Grid>
       <ToastContainer
@@ -397,7 +450,7 @@ function ItemPage() {
         pauseOnHover
         theme="light"
       />
-    </Box>
+    </Container>
   );
 }
 

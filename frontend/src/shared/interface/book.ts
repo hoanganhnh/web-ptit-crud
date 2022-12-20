@@ -5,14 +5,13 @@ export interface IBook {
   description: string;
   publicDate: string;
   page: number;
+  price: number;
   category: string;
   image: IImgageBook;
 }
 
 export interface IImgageBook {
   id: string;
-  filename: string;
   path: string;
-  mimetype: string;
   url: string;
 }

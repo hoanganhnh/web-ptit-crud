@@ -12,9 +12,15 @@ import {
 import { makeStyles } from "@mui/styles";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 
 import Comment from "../components/Comment";
 import Navbar from "../components/Navbar";
+import { useParams } from "react-router-dom";
+import axiosClient from "../services/axios-client";
+import { IBook } from "../shared/interface/book";
+import { ImageBookDefault } from "../components/ImageStatic";
+import dayjs from "dayjs";
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -43,6 +49,25 @@ const useStyles = makeStyles(() => ({
 
 function BookPage() {
   const classes = useStyles();
+
+  const [book, setBook] = React.useState<IBook>({} as IBook);
+
+  const { id } = useParams();
+
+  React.useEffect(() => {
+    const getBookById = async (id: string) => {
+      try {
+        const { data } = await axiosClient.get(`books/${id}`);
+        setBook(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    if (id) {
+      getBookById(id);
+    }
+  }, [id]);
+
   return (
     <>
       <Navbar />
@@ -53,7 +78,7 @@ function BookPage() {
               <Box className={classes.imgContainer}>
                 <img
                   className={classes.img}
-                  src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=928&q=80"
+                  src={book.image ? book.image.url : ImageBookDefault}
                   alt="product"
                 />
               </Box>
@@ -61,14 +86,14 @@ function BookPage() {
             <Grid item sm={12} md={12} lg={6}>
               <Box className={classes.content}>
                 <Typography gutterBottom variant="h4" component="div">
-                  Name
+                  {book.title}
                 </Typography>
                 <Typography
                   variant="h6"
                   color="text.secondary"
                   sx={{ marginBottom: 1 }}
                 >
-                  Nguyen Hoang Anh
+                  {book.author}
                 </Typography>
                 <Typography gutterBottom variant="h6" component="div">
                   Description
@@ -78,8 +103,46 @@ function BookPage() {
                   color="text.secondary"
                   sx={{ marginBottom: 2 }}
                 >
-                  Nulla eget sem vitae eros pharetra viverra. Nam vitae luctus
-                  ligula. Mauris consequat ornare feugiat.
+                  {book.description}
+                </Typography>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <Typography variant="h6" component="div">
+                    Public:
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    color="text.secondary"
+                    sx={{ marginLeft: 2 }}
+                  >
+                    {dayjs(book.publicDate).format("DD/MM/YYYY")}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <Typography variant="h6" component="div">
+                    Price:
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    color="text.secondary"
+                    sx={{ marginLeft: 2 }}
+                  >
+                    {`${book.price}`}
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    color="text.secondary"
+                    sx={{ display: "flex", alignItems: "center" }}
+                  >
+                    <AttachMoneyIcon />
+                  </Typography>
+                </Box>
+                <Typography
+                  gutterBottom
+                  variant="h6"
+                  component="div"
+                  sx={{ marginTop: 2 }}
+                >
+                  Amount
                 </Typography>
                 <Box className={classes.gruopBtn}>
                   <Box className={classes.gruopQty}>
@@ -87,16 +150,24 @@ function BookPage() {
                       <Button aria-label="increase" onClick={() => {}}>
                         <AddIcon fontSize="small" />
                       </Button>
-                      <Button disabled sx={{ color: "#000" }}>
-                        1
-                      </Button>
+                      <Button sx={{ pointerEvents: "none" }}>1</Button>
                       <Button aria-label="reduce" onClick={() => {}}>
                         <RemoveIcon fontSize="small" />
                       </Button>
                     </ButtonGroup>
                   </Box>
-                  <Button variant="contained">Order</Button>
                 </Box>
+                <Button
+                  variant="contained"
+                  sx={{
+                    marginTop: 3,
+                    padding: 2,
+                    minWidth: "200px",
+                    lineHeight: "24px",
+                  }}
+                >
+                  Order
+                </Button>
               </Box>
             </Grid>
           </Grid>

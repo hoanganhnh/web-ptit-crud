@@ -17,6 +17,7 @@ import {
   AppBar,
   Toolbar,
   Typography,
+  Container,
 } from "@mui/material";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
@@ -91,12 +92,12 @@ function AdminDashboard() {
   };
 
   return (
-    <Box className="App">
+    <Container maxWidth="xl" className="App">
       <Box sx={{ flexGrow: 1, marginBottom: 5 }}>
         <AppBar position="static" color="inherit">
           <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
             <Typography variant="h6" component="div">
-              MVC Book Online
+              Book online
             </Typography>
 
             {isAuthen && user !== null ? (
@@ -111,6 +112,11 @@ function AdminDashboard() {
                 >
                   {user.username}
                 </Typography>
+                <Button color="primary" sx={{ marginRight: 2 }}>
+                  <Link to="/" style={{ color: "#1976d2" }}>
+                    Home
+                  </Link>
+                </Button>
                 <Button variant="outlined" onClick={handleLogout}>
                   Log out
                 </Button>
@@ -156,6 +162,9 @@ function AdminDashboard() {
                 Category
               </TableCell>
               <TableCell align="center" sx={{ fontWeight: "600" }}>
+                Price
+              </TableCell>
+              <TableCell align="center" sx={{ fontWeight: "600" }}>
                 Action
               </TableCell>
             </TableRow>
@@ -173,6 +182,7 @@ function AdminDashboard() {
                 </TableCell>
                 <TableCell align="center">{row.page}</TableCell>
                 <TableCell align="center">{row.category}</TableCell>
+                <TableCell align="center">{row.price}</TableCell>
                 <TableCell align="center">
                   {isAuthen ? (
                     <>
@@ -220,7 +230,7 @@ function AdminDashboard() {
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </Container>
   );
 }
 
