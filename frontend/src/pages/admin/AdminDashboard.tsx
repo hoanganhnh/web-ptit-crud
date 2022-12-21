@@ -8,23 +8,19 @@ import {
   TableCell,
   TableBody,
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   Box,
   AppBar,
   Toolbar,
   Typography,
   Container,
 } from "@mui/material";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { isAuthenticated, logout, selectAuth } from "../../stores/slices/auth";
 import { useAppDispatch, useAppSelector } from "../../stores";
 import { IBook } from "../../shared/interface/book";
 import axiosClient from "../../services/axios-client";
+import DialogOption from "../../components/DialogOption";
 
 function AdminDashboard() {
   const [data, setData] = React.useState<IBook[]>([]);
@@ -32,7 +28,6 @@ function AdminDashboard() {
   const [itemId, setItemId] = React.useState<number>(0);
 
   const navigate = useNavigate();
-  const location = useLocation();
 
   const dispatch = useAppDispatch();
   const { auth: user } = useAppSelector(selectAuth);
@@ -55,13 +50,6 @@ function AdminDashboard() {
   };
 
   const editItem = (id: number) => {
-    if (!isAuthen) {
-      navigate("/signin", {
-        replace: true,
-        state: { from: location },
-      });
-      return;
-    }
     navigate(`/action/${id}`);
   };
 
@@ -71,13 +59,6 @@ function AdminDashboard() {
   };
 
   const deleleItem = (id: number) => {
-    if (!isAuthen) {
-      navigate("/signin", {
-        replace: true,
-        state: { from: location },
-      });
-      return;
-    }
     setOpen(true);
     setItemId(id);
   };
@@ -207,29 +188,7 @@ function AdminDashboard() {
           </TableBody>
         </Table>
       </TableContainer>
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"Do you want delete item? ❌"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Delete One Item ⭕️ 😬
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleAgree} autoFocus>
-            Agree
-          </Button>
-          <Button onClick={handleClose} color="error">
-            Disagree
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <DialogOption onAgree={handleAgree} onClose={handleClose} open={open} />
     </Container>
   );
 }
