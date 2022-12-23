@@ -13,6 +13,7 @@ import { makeStyles } from "@mui/styles";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import dayjs from "dayjs";
 
 import Comment from "../components/Comment";
 import Navbar from "../components/Navbar";
@@ -20,16 +21,19 @@ import { useParams } from "react-router-dom";
 import axiosClient from "../services/axios-client";
 import { IBook } from "../shared/interface/book";
 import { ImageBookDefault } from "../components/ImageStatic";
-import dayjs from "dayjs";
+import { IComment } from "../shared/interface/comment";
+import { useAppSelector } from "../stores";
+import { isAuthenticated } from "../stores/slices/auth";
+import Footer from "../components/Footer";
 
 const useStyles = makeStyles(() => ({
   container: {
     marginTop: 24,
   },
-  imgContainer: { height: 560 },
+  imgContainer: { height: "100%", width: "100%" },
   img: {
-    width: "100%",
-    height: "100%",
+    width: "90%",
+    height: "90%",
     objectFit: "cover",
   },
   content: {
@@ -51,6 +55,12 @@ function BookPage() {
   const classes = useStyles();
 
   const [book, setBook] = React.useState<IBook>({} as IBook);
+  const [comments, setComments] = React.useState<IComment[]>([]);
+  const [rate, setRate] = React.useState(0);
+  const [content, setContent] = React.useState<string>("");
+  const [disable, setDisable] = React.useState(true);
+
+  const isAuthen = useAppSelector(isAuthenticated);
 
   const { id } = useParams();
 
@@ -58,7 +68,9 @@ function BookPage() {
     const getBookById = async (id: string) => {
       try {
         const { data } = await axiosClient.get(`books/${id}`);
+
         setBook(data);
+        setComments(data.comments);
       } catch (error) {
         console.log(error);
       }
@@ -67,6 +79,57 @@ function BookPage() {
       getBookById(id);
     }
   }, [id]);
+
+  const onRateChange = (event: React.SyntheticEvent, value: number | null) => {
+    if (value) {
+      setRate(value);
+    }
+  };
+
+  const resetCommetInput = React.useCallback(() => {
+    setContent("");
+    setDisable(true);
+    setRate(0);
+  }, []);
+
+  const onChangeCommentContent = (
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+  ) => {
+    const { value } = e.target;
+
+    if (value) {
+      setDisable(false);
+    } else {
+      setDisable(true);
+    }
+    setContent(value);
+  };
+
+  const handleAddComment = async () => {
+    try {
+      const { data } = await axiosClient.post("comments", {
+        content,
+        rate,
+        bookId: id,
+      });
+      setComments((preState) => [...preState, data]);
+      resetCommetInput();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleDeleteComment = async (commentId: number) => {
+    try {
+      await axiosClient.delete(`comments/${commentId}`);
+      setComments((preState) =>
+        preState.filter((comment) => comment.id !== commentId)
+      );
+    } catch (error) {
+      console.log("delete comment");
+      console.log(error);
+    }
+  };
 
   return (
     <>
@@ -173,42 +236,68 @@ function BookPage() {
           </Grid>
         </Box>
         <Box sx={{ textAlign: "left", marginTop: 6 }}>
-          <Typography
-            gutterBottom
-            variant="h6"
-            component="div"
-            sx={{ marginBottom: 2 }}
-          >
-            Comments
-          </Typography>
-          <Comment sx={{ marginBottom: 2 }} />
-          <Comment sx={{ marginBottom: 2 }} />
-          <Typography gutterBottom variant="h6" component="div">
-            Add a comment
-          </Typography>
-          <Box component="form">
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Typography variant="body1" component="div">
-                Rate this Book ?
+          {comments.length ? (
+            <Typography
+              gutterBottom
+              variant="h6"
+              component="div"
+              sx={{ marginBottom: 2 }}
+            >
+              Comments
+            </Typography>
+          ) : null}
+          {comments.map((comment) => {
+            return (
+              <Comment
+                key={comment.id}
+                comment={comment}
+                onDeleteComment={handleDeleteComment}
+                sx={{ marginBottom: 2 }}
+              />
+            );
+          })}
+          {isAuthen ? (
+            <>
+              <Typography gutterBottom variant="h6" component="div">
+                Add a comment
               </Typography>
-              <Rating value={3} sx={{ marginLeft: 3 }} />
-            </Box>
-            <TextField
-              margin="normal"
-              fullWidth
-              id="add-comment"
-              name="add-comment"
-              multiline
-              minRows={5}
-              maxRows={10}
-              placeholder="Write a comment..."
-            />
-            <Button variant="contained" sx={{ marginTop: "24px" }}>
-              Add my comment
-            </Button>
-          </Box>
+              <Box component="form">
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <Typography variant="body1" component="div">
+                    Rate this Book ?
+                  </Typography>
+                  <Rating
+                    value={rate}
+                    sx={{ marginLeft: 3 }}
+                    onChange={onRateChange}
+                  />
+                </Box>
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="add-comment"
+                  name="add-comment"
+                  multiline
+                  minRows={5}
+                  maxRows={10}
+                  placeholder="Write a comment..."
+                  value={content}
+                  onChange={onChangeCommentContent}
+                />
+                <Button
+                  variant="contained"
+                  sx={{ marginTop: "24px" }}
+                  disabled={disable}
+                  onClick={handleAddComment}
+                >
+                  Add my comment
+                </Button>
+              </Box>
+            </>
+          ) : null}
         </Box>
       </Container>
+      <Footer />
     </>
   );
 }
