@@ -2,11 +2,13 @@ import {
   Column,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
 import { LocalFile } from './local-file.entity';
+import { Comment } from '../../comments/entities/comment.entity';
 
 @Entity({ name: 'books' })
 export class Book {
@@ -41,4 +43,9 @@ export class Book {
   })
   @JoinColumn()
   image: LocalFile;
+
+  @OneToMany(() => Comment, (comment) => comment.book, {
+    eager: true,
+  })
+  comments: Comment[];
 }

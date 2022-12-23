@@ -23,6 +23,7 @@ import { OrdersService } from './orders.service';
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+  @Auth(Role.USER)
   @Post()
   async createOrder(@Body() createOrderDto: CreateOrderDto) {
     const order = await this.ordersService.createOrder(createOrderDto);

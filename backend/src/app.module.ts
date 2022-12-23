@@ -9,6 +9,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { BooksModule } from './modules/books/books.module';
 import { UserModule } from './modules/users/user.module';
 import { OrdersModule } from './modules/orders/orders.module';
+import { CommentsModule } from './modules/comments/comments.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { OrdersModule } from './modules/orders/orders.module';
     UserModule,
     AuthModule,
     OrdersModule,
+    CommentsModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
