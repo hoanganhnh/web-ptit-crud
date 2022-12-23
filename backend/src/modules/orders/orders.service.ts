@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from './order.enity';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class OrdersService {
@@ -13,11 +14,11 @@ export class OrdersService {
     private readonly orderRepository: Repository<Order>,
   ) {}
 
-  async createOrder(createOrderDto: CreateOrderDto) {
+  async createOrder(user: User, createOrderDto: CreateOrderDto) {
     const oderIsExisted = await this.orderRepository.findOne({
       where: {
         user: {
-          id: createOrderDto.userId,
+          id: user.id,
         },
         book: {
           id: createOrderDto.bookId,
@@ -31,10 +32,8 @@ export class OrdersService {
       });
     }
     const order = await this.orderRepository.create({
-      amount: createOrderDto.amount,
-      user: {
-        id: createOrderDto.userId,
-      },
+      ...createOrderDto,
+      user,
       book: {
         id: createOrderDto.bookId,
       },

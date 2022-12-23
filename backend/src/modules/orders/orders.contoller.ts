@@ -25,8 +25,11 @@ export class OrdersController {
 
   @Auth(Role.USER)
   @Post()
-  async createOrder(@Body() createOrderDto: CreateOrderDto) {
-    const order = await this.ordersService.createOrder(createOrderDto);
+  async createOrder(
+    @Body() createOrderDto: CreateOrderDto,
+    @User() user: UserEntity,
+  ) {
+    const order = await this.ordersService.createOrder(user, createOrderDto);
     return order;
   }
 
@@ -36,7 +39,7 @@ export class OrdersController {
   }
 
   @Auth(Role.USER)
-  @Post('my-orders')
+  @Post('my-order')
   findMyOrders(@User() user: UserEntity) {
     return this.ordersService.findMyOrders(user.id);
   }

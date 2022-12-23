@@ -1,11 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Book } from '../books/entities/book.entity';
 import { User } from '../users/entities/user.entity';
@@ -18,15 +11,9 @@ export class Order {
   @Column()
   amount: number;
 
-  @ManyToOne(() => User, (user) => user.id)
-  @JoinColumn({
-    name: 'user_id',
-  })
+  @ManyToOne(() => User)
   user: User;
 
-  @OneToOne(() => Book, (book) => book.id)
-  @JoinColumn({
-    name: 'book_id',
-  })
+  @ManyToOne(() => Book)
   book: Book;
 }
