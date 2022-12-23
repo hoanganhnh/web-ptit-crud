@@ -1,4 +1,5 @@
 import React from "react";
+import { useParams } from "react-router-dom";
 import {
   Box,
   Button,
@@ -10,6 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
+import { toast, ToastContainer } from "react-toastify";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
@@ -17,7 +19,6 @@ import dayjs from "dayjs";
 
 import Comment from "../components/Comment";
 import Navbar from "../components/Navbar";
-import { useParams } from "react-router-dom";
 import axiosClient from "../services/axios-client";
 import { IBook } from "../shared/interface/book";
 import { ImageBookDefault } from "../components/ImageStatic";
@@ -59,6 +60,9 @@ function BookPage() {
   const [rate, setRate] = React.useState(0);
   const [content, setContent] = React.useState<string>("");
   const [disable, setDisable] = React.useState(true);
+
+  // order
+  const [amount, setAmount] = React.useState(0);
 
   const isAuthen = useAppSelector(isAuthenticated);
 
@@ -127,6 +131,38 @@ function BookPage() {
       );
     } catch (error) {
       console.log("delete comment");
+      console.log(error);
+    }
+  };
+
+  const onIncrementAmount = React.useCallback(() => {
+    setAmount((preState) => preState + 1);
+  }, []);
+
+  const onDecrementAmount = React.useCallback(() => {
+    setAmount((preState) => {
+      if (preState <= 0) {
+        return 0;
+      }
+      return preState - 1;
+    });
+  }, []);
+
+  const handleOrder = async () => {
+    if (!amount) {
+      toast.error("Please choose amount book !");
+      return;
+    }
+    try {
+      const { status } = await axiosClient.post("orders", {
+        amount,
+        bookId: id,
+      });
+
+      if (status === 201) {
+        toast.success("Order book successfull!");
+      }
+    } catch (error) {
       console.log(error);
     }
   };
@@ -210,11 +246,11 @@ function BookPage() {
                 <Box className={classes.gruopBtn}>
                   <Box className={classes.gruopQty}>
                     <ButtonGroup>
-                      <Button aria-label="increase" onClick={() => {}}>
+                      <Button aria-label="increase" onClick={onIncrementAmount}>
                         <AddIcon fontSize="small" />
                       </Button>
-                      <Button sx={{ pointerEvents: "none" }}>1</Button>
-                      <Button aria-label="reduce" onClick={() => {}}>
+                      <Button sx={{ pointerEvents: "none" }}>{amount}</Button>
+                      <Button aria-label="reduce" onClick={onDecrementAmount}>
                         <RemoveIcon fontSize="small" />
                       </Button>
                     </ButtonGroup>
@@ -228,6 +264,7 @@ function BookPage() {
                     minWidth: "200px",
                     lineHeight: "24px",
                   }}
+                  onClick={handleOrder}
                 >
                   Order
                 </Button>
@@ -297,6 +334,17 @@ function BookPage() {
           ) : null}
         </Box>
       </Container>
+      <ToastContainer
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <Footer />
     </>
   );
