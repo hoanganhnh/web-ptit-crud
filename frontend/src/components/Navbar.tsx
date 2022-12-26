@@ -1,3 +1,4 @@
+import React from "react";
 import {
   AppBar,
   Badge,
@@ -15,6 +16,12 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { Router } from "../routers/Router";
 import { useAppDispatch, useAppSelector } from "../stores";
 import { isAuthenticated, logout, selectAdmin } from "../stores/slices/auth";
+import {
+  getMyOrder,
+  ordersSelector,
+  setOrdersStore,
+} from "../stores/slices/order";
+import { unwrapResult } from "@reduxjs/toolkit";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -51,6 +58,17 @@ function Navbar() {
   const dispatch = useAppDispatch();
   const isAdmin = useAppSelector(selectAdmin);
   const isAuthen = useAppSelector(isAuthenticated);
+  const { orders } = useAppSelector(ordersSelector);
+
+  React.useEffect(() => {
+    const getMyOrders = async () => {
+      const res = await dispatch(getMyOrder());
+      const orders = await unwrapResult(res);
+      dispatch(setOrdersStore(orders));
+    };
+
+    getMyOrders();
+  }, []);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -81,9 +99,13 @@ function Navbar() {
             )}
 
             <Link to={Router.order} className={classes.link}>
-              <Badge badgeContent={4} color="primary">
+              {orders.length ? (
+                <Badge badgeContent={orders.length} color="primary">
+                  <ShoppingCartIcon sx={{ fontSize: "30px" }} />
+                </Badge>
+              ) : (
                 <ShoppingCartIcon sx={{ fontSize: "30px" }} />
-              </Badge>
+              )}
             </Link>
 
             {isAuthen ? (

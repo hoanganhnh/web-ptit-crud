@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { unwrapResult } from "@reduxjs/toolkit";
 import {
   Button,
   ButtonGroup,
@@ -22,6 +23,8 @@ import Footer from "../components/Footer";
 import DialogOption from "../components/DialogOption";
 import axiosClient from "../services/axios-client";
 import { IOrder } from "../shared/interface/order";
+import { useAppDispatch } from "../stores";
+import { getMyOrder, setOrdersStore } from "../stores/slices/order";
 
 function OrderPage() {
   const [open, setOpen] = React.useState(false);
@@ -29,12 +32,15 @@ function OrderPage() {
   const [idItem, setIdItem] = React.useState("");
   const [total, setTotal] = React.useState(0);
 
+  const dispatch = useAppDispatch();
+
   React.useEffect(() => {
     const getMyOrders = async () => {
       try {
-        const { data } = await axiosClient.post("orders/my-order");
-        setOrders(data);
-        caculatorTotalPrice(data);
+        const res = await dispatch(getMyOrder());
+        const orders = await unwrapResult(res);
+        setOrders(orders);
+        caculatorTotalPrice(orders);
       } catch (error) {
         console.log(error);
       }
@@ -71,6 +77,7 @@ function OrderPage() {
       setOrders((preState) => {
         const nextState = preState.filter((order) => order.id !== orderId);
         caculatorTotalPrice(nextState);
+        dispatch(setOrdersStore(nextState));
         return nextState;
       });
     } catch (error) {

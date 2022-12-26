@@ -23,9 +23,10 @@ import axiosClient from "../services/axios-client";
 import { IBook } from "../shared/interface/book";
 import { ImageBookDefault } from "../components/ImageStatic";
 import { IComment } from "../shared/interface/comment";
-import { useAppSelector } from "../stores";
+import { useAppDispatch, useAppSelector } from "../stores";
 import { isAuthenticated } from "../stores/slices/auth";
 import Footer from "../components/Footer";
+import { getMyOrder } from "../stores/slices/order";
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -65,6 +66,7 @@ function BookPage() {
   const [amount, setAmount] = React.useState(0);
 
   const isAuthen = useAppSelector(isAuthenticated);
+  const dispatch = useAppDispatch();
 
   const { id } = useParams();
 
@@ -160,6 +162,7 @@ function BookPage() {
       });
 
       if (status === 201) {
+        await dispatch(getMyOrder());
         toast.success("Order book successfull!");
       }
     } catch (error) {
