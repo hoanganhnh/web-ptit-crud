@@ -17,7 +17,7 @@ export const getMyOrder = createAsyncThunk(
 );
 
 interface IState {
-  orders: IOrder[];
+  orders: { id: string }[];
 }
 
 const initialState: IState = {
@@ -28,8 +28,21 @@ const orderSplice = createSlice({
   name: "order",
   initialState,
   reducers: {
-    setOrdersStore: (state, action: { payload: IOrder[] }) => {
+    setOrdersStore: (state, action: { payload: { id: string }[] }) => {
       state.orders = action.payload;
+    },
+    updateOrder: (state, action: { payload: { id: string } }) => {
+      const existedOrder = state.orders.filter(
+        (order) => order.id === action.payload.id
+      ).length;
+
+      if (!existedOrder) {
+        state.orders.push(action.payload);
+      } else {
+        state.orders = [...state.orders].filter(
+          (order) => order.id !== action.payload.id
+        );
+      }
     },
   },
   extraReducers: (builder) => {
@@ -42,7 +55,7 @@ const orderSplice = createSlice({
   },
 });
 
-export const { setOrdersStore } = orderSplice.actions;
+export const { setOrdersStore, updateOrder } = orderSplice.actions;
 
 export const ordersSelector = (state: RootState) => state.order;
 

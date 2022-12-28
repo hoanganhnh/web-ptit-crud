@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 import { store } from "../stores";
 
@@ -18,5 +18,9 @@ axiosClient.interceptors.request.use(async (request) => {
   }
   return request;
 });
+
+export function isAxiosError<T>(error: unknown): error is AxiosError<T> {
+  return axios.isAxiosError(error);
+}
 
 export default axiosClient;
