@@ -57,7 +57,7 @@ function Comment({ sx, comment, onDeleteComment }: CommentProps) {
                 display: "flex",
               }}
             >
-              <Box>
+              <Box sx={{ minWidth: "96px" }}>
                 <Typography component="div">{comment.user.username}</Typography>
                 <Typography
                   component="span"
