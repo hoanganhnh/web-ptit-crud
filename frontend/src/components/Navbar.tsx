@@ -15,7 +15,12 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 import { Router } from "../routers/Router";
 import { useAppDispatch, useAppSelector } from "../stores";
-import { isAuthenticated, logout, selectAdmin } from "../stores/slices/auth";
+import {
+  isAuthenticated,
+  logout,
+  selectAdmin,
+  selectAuth,
+} from "../stores/slices/auth";
 import {
   getMyOrder,
   ordersSelector,
@@ -58,6 +63,7 @@ function Navbar() {
   const dispatch = useAppDispatch();
   const isAdmin = useAppSelector(selectAdmin);
   const isAuthen = useAppSelector(isAuthenticated);
+  const { auth: user } = useAppSelector(selectAuth);
   const { orders } = useAppSelector(ordersSelector);
 
   React.useEffect(() => {
@@ -114,12 +120,16 @@ function Navbar() {
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
+                  alignItems: "center",
                   marginLeft: 1,
                 }}
               >
-                <Link to={Router.profile} className={classes.link}>
-                  <AccountCircleIcon sx={{ fontSize: "30px" }} />
-                </Link>
+                <Typography
+                  component="legend"
+                  sx={{ margin: "0 12px", userSelect: "none" }}
+                >
+                  {user?.username}
+                </Typography>
                 <Button
                   variant="outlined"
                   onClick={handleLogout}
