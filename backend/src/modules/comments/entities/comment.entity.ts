@@ -26,7 +26,9 @@ export class Comment {
   })
   user: User;
 
-  @ManyToOne(() => Book, (book) => book.comments)
+  @ManyToOne(() => Book, (book) => book.comments, {
+    onDelete: 'CASCADE',
+  })
   book: Book;
 
   @CreateDateColumn({ type: 'timestamp' })

@@ -14,6 +14,8 @@ export class Order {
   @ManyToOne(() => User)
   user: User;
 
-  @ManyToOne(() => Book)
+  @ManyToOne(() => Book, {
+    onDelete: 'CASCADE',
+  })
   book: Book;
 }
