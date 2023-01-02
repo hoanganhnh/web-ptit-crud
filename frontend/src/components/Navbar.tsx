@@ -16,12 +16,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { Router } from "../routers/Router";
 import { useAppDispatch, useAppSelector } from "../stores";
 import { isAuthenticated, logout, selectAdmin } from "../stores/slices/auth";
-import {
-  getMyOrder,
-  ordersSelector,
-  setOrdersStore,
-} from "../stores/slices/order";
-import { unwrapResult } from "@reduxjs/toolkit";
+import { useOrders } from "../hooks/query/useOrders";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -58,21 +53,12 @@ function Navbar() {
   const dispatch = useAppDispatch();
   const isAdmin = useAppSelector(selectAdmin);
   const isAuthen = useAppSelector(isAuthenticated);
-  const { orders } = useAppSelector(ordersSelector);
 
-  React.useEffect(() => {
-    const getMyOrders = async () => {
-      const res = await dispatch(getMyOrder());
-      const orders = await unwrapResult(res);
-      dispatch(setOrdersStore(orders));
-    };
+  const ordersQuery = useOrders();
 
-    getMyOrders();
-  }, []);
-
-  const handleLogout = () => {
+  const handleLogout = React.useCallback(() => {
     dispatch(logout());
-  };
+  }, []);
 
   return (
     <Container maxWidth="lg">
@@ -99,8 +85,8 @@ function Navbar() {
             )}
 
             <Link to={Router.order} className={classes.link}>
-              {orders.length ? (
-                <Badge badgeContent={orders.length} color="primary">
+              {ordersQuery?.data && ordersQuery?.data.length ? (
+                <Badge badgeContent={ordersQuery?.data.length} color="primary">
                   <ShoppingCartIcon sx={{ fontSize: "30px" }} />
                 </Badge>
               ) : (

@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { unwrapResult } from "@reduxjs/toolkit";
 import {
   Button,
   ButtonGroup,
@@ -17,14 +16,15 @@ import {
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import DialogOption from "../components/DialogOption";
 import axiosClient from "../services/axios-client";
 import { IOrder } from "../shared/interface/order";
-import { useAppDispatch } from "../stores";
-import { getMyOrder, setOrdersStore } from "../stores/slices/order";
+import { useOrders } from "../hooks/query/useOrders";
+import { deleteOrder } from "../services/order.service";
 
 function OrderPage() {
   const [open, setOpen] = React.useState(false);
@@ -32,21 +32,19 @@ function OrderPage() {
   const [idItem, setIdItem] = React.useState("");
   const [total, setTotal] = React.useState(0);
 
-  const dispatch = useAppDispatch();
+  const ordersQuery = useOrders();
+  const queryClient = useQueryClient();
+  const ordersDeleteMutation = useMutation({
+    mutationFn: (id: string) => deleteOrder(id),
+  });
 
   React.useEffect(() => {
-    const getMyOrders = async () => {
-      try {
-        const res = await dispatch(getMyOrder());
-        const orders = await unwrapResult(res);
-        setOrders(orders);
-        caculatorTotalPrice(orders);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getMyOrders();
-  }, []);
+    if (ordersQuery.data) {
+      const orders = ordersQuery.data;
+      setOrders(orders);
+      caculatorTotalPrice(orders);
+    }
+  }, [ordersQuery.data]);
 
   const caculatorTotalPrice = React.useCallback((data: any[]) => {
     const totalPrice = data.reduce((value: number, currentValue: IOrder) => {
@@ -73,11 +71,14 @@ function OrderPage() {
 
   const onDeleteCartItem = React.useCallback(async (orderId: string) => {
     try {
-      await axiosClient.delete(`orders/${orderId}`);
+      await ordersDeleteMutation.mutateAsync(orderId, {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ["orders"] });
+        },
+      });
       setOrders((preState) => {
         const nextState = preState.filter((order) => order.id !== orderId);
         caculatorTotalPrice(nextState);
-        dispatch(setOrdersStore(nextState));
         return nextState;
       });
     } catch (error) {

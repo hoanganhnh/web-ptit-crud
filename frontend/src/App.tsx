@@ -18,7 +18,13 @@ import OrderPage from "./pages/OrderPage";
 import Profile from "./pages/Profile";
 import { Router } from "./routers/Router";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function App() {
   return (

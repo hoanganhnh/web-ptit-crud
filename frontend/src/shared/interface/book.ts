@@ -1,3 +1,5 @@
+import { IComment } from "./comment";
+
 export interface IBook {
   id: number;
   title: string;
@@ -8,6 +10,7 @@ export interface IBook {
   price: number;
   category: string;
   image: IImgageBook;
+  comments: Array<IComment>;
 }
 
 export interface IImgageBook {

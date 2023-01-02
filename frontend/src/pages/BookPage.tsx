@@ -16,17 +16,19 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import dayjs from "dayjs";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import Comment from "../components/Comment";
 import Navbar from "../components/Navbar";
-import axiosClient from "../services/axios-client";
 import { IBook } from "../shared/interface/book";
 import { ImageBookDefault } from "../components/ImageStatic";
 import { IComment } from "../shared/interface/comment";
-import { useAppDispatch, useAppSelector } from "../stores";
+import { useAppSelector } from "../stores";
 import { isAuthenticated } from "../stores/slices/auth";
 import Footer from "../components/Footer";
-import { getMyOrder } from "../stores/slices/order";
+import { getBookById } from "../services/book.service";
+import { createComment, deleteComment } from "../services/comment.service";
+import { createOrder } from "../services/order.service";
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -66,25 +68,39 @@ function BookPage() {
   const [amount, setAmount] = React.useState(0);
 
   const isAuthen = useAppSelector(isAuthenticated);
-  const dispatch = useAppDispatch();
 
   const { id } = useParams();
 
-  React.useEffect(() => {
-    const getBookById = async (id: string) => {
-      try {
-        const { data } = await axiosClient.get(`books/${id}`);
+  const queryClient = useQueryClient();
 
-        setBook(data);
-        setComments(data.comments);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    if (id) {
-      getBookById(id);
+  const bookQuery = useQuery({
+    queryKey: ["students", id],
+    queryFn: () => getBookById(id as string),
+    enabled: id !== undefined,
+  });
+
+  const createCommentMutation = useMutation({
+    mutationFn: (data: { content: string; rate: number; bookId: string }) => {
+      return createComment(data);
+    },
+  });
+
+  const deleteCommentMutation = useMutation({
+    mutationFn: (id: number) => deleteComment(id),
+  });
+
+  const creatOrderMutation = useMutation({
+    mutationFn: (data: { amount: number; bookId: string }) => {
+      return createOrder(data);
+    },
+  });
+
+  React.useEffect(() => {
+    if (bookQuery.data) {
+      setBook(bookQuery.data);
+      setComments(bookQuery.data.comments);
     }
-  }, [id]);
+  }, [bookQuery.data]);
 
   const onRateChange = (event: React.SyntheticEvent, value: number | null) => {
     if (value) {
@@ -113,12 +129,12 @@ function BookPage() {
 
   const handleAddComment = async () => {
     try {
-      const { data } = await axiosClient.post("comments", {
+      const comment = await createCommentMutation.mutateAsync({
         content,
         rate,
-        bookId: id,
+        bookId: id as string,
       });
-      setComments((preState) => [...preState, data]);
+      setComments((preState) => [...preState, comment]);
       resetCommetInput();
     } catch (error) {
       console.log(error);
@@ -126,15 +142,10 @@ function BookPage() {
   };
 
   const handleDeleteComment = async (commentId: number) => {
-    try {
-      await axiosClient.delete(`comments/${commentId}`);
-      setComments((preState) =>
-        preState.filter((comment) => comment.id !== commentId)
-      );
-    } catch (error) {
-      console.log("delete comment");
-      console.log(error);
-    }
+    deleteCommentMutation.mutate(commentId);
+    setComments((preState) =>
+      preState.filter((comment) => comment.id !== commentId)
+    );
   };
 
   const onIncrementAmount = React.useCallback(() => {
@@ -155,18 +166,19 @@ function BookPage() {
       toast.error("Please choose amount book !");
       return;
     }
-    try {
-      const { status } = await axiosClient.post("orders", {
+    const order = await creatOrderMutation.mutateAsync(
+      {
         amount,
-        bookId: id,
-      });
-
-      if (status === 201) {
-        await dispatch(getMyOrder());
-        toast.success("Order book successfull!");
+        bookId: id as string,
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ["orders"] });
+        },
       }
-    } catch (error) {
-      console.log(error);
+    );
+    if (order.id) {
+      toast.success("Order book successfull!");
     }
   };
 
